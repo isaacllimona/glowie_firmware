@@ -1,0 +1,13 @@
+# build files
+build/
+.cache
+sdkconfig
+sdkconfig.*
+dependencies.lock
+managed_components
+
+# local environment
+dev_shell.sh
+.vscode
+.clangd
+local/
