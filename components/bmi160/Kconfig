@@ -1,0 +1,30 @@
+menu "BMI160"
+
+    menu "SPI"
+        config BMI160_SPI_MISO_PIN
+            int "MISO pin"
+            range 0 19
+            default 2
+
+        config BMI160_SPI_MOSI_PIN
+            int "MOSI pin"
+            range 0 19
+            default 7
+
+        config BMI160_SPI_SCLK_PIN
+            int "SCLK pin"
+            range 0 19
+            default 6
+
+        config BMI160_SPI_CS_PIN
+            int "Chip select pin"
+            range 0 19
+            default 10
+
+        config BMI160_SPI_CLOCK_HZ
+            int "Clock frequency for the SPI connection in HZ"
+            range 0 10000000
+            default 10000000
+    endmenu
+
+endmenu
