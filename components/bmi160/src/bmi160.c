@@ -3,6 +3,7 @@
 #include "esp_log.h"
 
 #include "bmi160.h"
+#include "bmi160_ll.h"
 
 #define DELAY_MS(t) vTaskDelay(t/portTICK_PERIOD_MS)
 #define LOG_TAG "BMI160"
@@ -28,4 +29,31 @@ int bmi160_init(void){
     }
     
     return 0;
+}
+
+void bmi160_acc_enable(bmi160_acc_config_t config, bmi160_acc_range_t range){
+    if(config.us){
+        ESP_LOGW(LOG_TAG, "Undersampling is not supported");
+    }
+
+    bmi160_write(BMI160_REG_COMMAND, BMI160_CMD_ACCEL_SET_PMU_NORMAL);
+    DELAY_MS(10);
+
+    bmi160_write(BMI160_REG_ACCEL_CONF, config.byte);
+    bmi160_write(BMI160_REG_ACCEL_RANGE, range);
+    bmi160_read(BMI160_REG_ACCEL_DATA); // to clear data
+}
+
+void bmi160_gyro_enable(bmi160_gyro_config_t config, bmi160_gyro_range_t range){
+    bmi160_write(BMI160_REG_COMMAND, BMI160_CMD_GYRO_SET_PMU_NORMAL);
+    DELAY_MS(100);
+
+    bmi160_write(BMI160_REG_GYRO_CONF, config.byte);
+    bmi160_write(BMI160_REG_GYRO_RANGE, range);
+    bmi160_read(BMI160_REG_GYRO_DATA); // to clear data
+}
+
+void bmi160_soft_reset(void) {
+    bmi160_write(BMI160_REG_COMMAND, BMI160_CMD_SOFT_RESET);
+    bmi160_interface_start();
 }
