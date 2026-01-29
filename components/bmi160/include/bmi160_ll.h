@@ -1,6 +1,8 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdbool.h>
+#include <assert.h>
 
 /**
  * @brief BMI160 register addresses
@@ -108,10 +110,34 @@ typedef enum: uint8_t {
 void bmi160_interface_init(void);
 
 /**
- * @brief Set up the interface on the BMI160 side. This will have to be performed again after a BMI160 soft reset.
+ * @brief Set up the interface on the BMI160 side. Must be called again after a BMI160 soft reset.
 **/
 void bmi160_interface_start(void);
 
 void bmi160_write(bmi160_reg_t addr, uint8_t data);
 uint8_t bmi160_read(bmi160_reg_t addr);
 void bmi160_read_multiple(bmi160_reg_t addr, unsigned int length, void *buffer);
+
+
+// ==== Register access abstractions ====
+
+static inline void bmi160_ll_fifo_downsampling_write(bool acc_filtered, bool gyro_filtered,
+    uint8_t acc_downsampling,  //> Valid range: 0-7. Actual downsampling ratio is 2^acc_downsampling.
+    uint8_t gyro_downsampling  //> Valid range: 0-7. Actual downsampling ratio is 2^gyro_downsampling.
+) {
+    assert(acc_downsampling < 8);  // Must fit in 3 bits
+    assert(gyro_downsampling < 8);  // Must fit in 3 bits
+
+    bmi160_write(BMI160_REG_FIFO_DOWNS,
+        (acc_filtered ? 0x80 : 0x00) | (acc_downsampling << 4) | (gyro_filtered ? 0x08 : 0x00) | (gyro_downsampling));
+}
+
+static inline uint16_t bmi160_ll_fifo_length_read() {
+    uint8_t fifo_length_regs[2];
+    bmi160_read_multiple(BMI160_REG_FIFO_LENGTH, 2, fifo_length_regs);
+    return ((uint16_t)(fifo_length_regs[1] & 0x07) << 8) + fifo_length_regs[0];
+}
+
+static inline void bmi160_ll_fifo_data_read(uint8_t *out_buffer, size_t len) {
+    bmi160_read_multiple(BMI160_REG_FIFO_DATA, len, out_buffer);
+}
