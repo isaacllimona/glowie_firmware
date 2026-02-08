@@ -31,7 +31,7 @@ static void host_task(void *param) {
     nimble_port_freertos_deinit();
 }
 
-void glowy_comms_init(comms_init_t init) {
+void glowy_comms_init(glowy_comms_init_t init) {
     esp_err_t ret = nimble_port_init();
     ESP_ERROR_CHECK(ret);
 

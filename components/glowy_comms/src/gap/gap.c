@@ -6,7 +6,7 @@
 
 #include "sdkconfig.h"
 
-#include "../uuid.h"
+#include "uuid.h"
 #include "gap.h"
 
 

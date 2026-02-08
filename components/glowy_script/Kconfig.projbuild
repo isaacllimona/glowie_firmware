@@ -1,0 +1,9 @@
+menu "Scripting"
+
+    config SCRIPT_INPUT_BUFFER_SIZE
+        int "Size of the input buffer"
+        help
+            Size of the buffer where input to the scripting module will be copied.
+            Must be large enough to fit any input that may be given to the scripting module.
+
+endmenu
