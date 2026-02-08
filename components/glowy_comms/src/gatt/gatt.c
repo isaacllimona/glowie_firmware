@@ -48,9 +48,11 @@ int gatt_init(gatt_init_t init) {
 static int on_enable_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg){
     assert(ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR);
     assert(attr_handle == control_enable_handle);
-    assert(ctxt->om->om_len == 1);
+    if(ctxt->om->om_len != 1) return BLE_ATT_ERR_INVALID_ATTR_VALUE_LEN;
 
-    bool val = ctxt->om->om_data[0];
+    uint8_t val = ctxt->om->om_data[0];
+    if (val > 1) return 0xFF;  // value out of range (accept only 0 or 1)
+
     ESP_LOGD(TAG, "Received write to onoff characteristic. Value: %d", val);
     callbacks.set_enable_cb(val);
 
@@ -60,9 +62,9 @@ static int on_enable_write(uint16_t conn_handle, uint16_t attr_handle, struct bl
 static int on_brightness_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg){
     assert(ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR);
     assert(attr_handle == control_brightness_handle);
-    assert(ctxt->om->om_len == 1);
+    if(ctxt->om->om_len != 1) return BLE_ATT_ERR_INVALID_ATTR_VALUE_LEN;
 
-    int val = ctxt->om->om_data[0];
+    uint8_t val = ctxt->om->om_data[0];
     ESP_LOGD(TAG, "Received write to brightness characteristic. Value: %d", val);
     callbacks.set_brightness_cb(val);
 
@@ -72,7 +74,7 @@ static int on_brightness_write(uint16_t conn_handle, uint16_t attr_handle, struc
 static int on_rgb_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg){
     assert(ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR);
     assert(attr_handle == control_rgb_handle);
-    assert(ctxt->om->om_len == 3);
+    if(ctxt->om->om_len != 3) return BLE_ATT_ERR_INVALID_ATTR_VALUE_LEN;
 
     int r = ctxt->om->om_data[0];
     int g = ctxt->om->om_data[1];
