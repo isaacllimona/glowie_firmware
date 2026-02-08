@@ -34,7 +34,7 @@ static void get_own_addr(uint8_t *addr_type, uint8_t addr_val[]) {
 
 static int on_gap_event(struct ble_gap_event *event, void *arg);
 
-uint8_t addr_type;
+static uint8_t addr_type;
 
 static void advertisement_setup(void) {
     uint8_t addr_val[6];

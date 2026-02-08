@@ -16,9 +16,9 @@
 static_assert(strlen(CONFIG_DEVICE_NAME) <= MYNEWT_VAL_BLE_SVC_GAP_DEVICE_NAME_MAX_LENGTH,
               "Device name too long");
 
-comms_callbacks_t callbacks;
+static comms_callbacks_t callbacks;
 
-const struct ble_gatt_svc_def service_definitions[] = {
+static const struct ble_gatt_svc_def service_definitions[] = {
     control_srvc_def,
     {0}
 };

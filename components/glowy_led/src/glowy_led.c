@@ -13,11 +13,11 @@
 
 #define LED_BRIGHTNESS_MAX 255
 
-bool enabled = true;
-uint8_t brightness = LED_BRIGHTNESS_MAX;
-struct {uint8_t r, g, b;} color = {0}; // LED color before intensity scaling
+static bool enabled = true;
+static uint8_t brightness = LED_BRIGHTNESS_MAX;
+static struct {uint8_t r, g, b;} color = {0}; // LED color before intensity scaling
 
-led_strip_handle_t led_handle;
+static led_strip_handle_t led_handle;
 
 void glowy_led_init(void){
     const led_strip_config_t strip_config = {
