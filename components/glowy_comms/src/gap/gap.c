@@ -28,7 +28,7 @@ static void get_own_addr(uint8_t *addr_type, uint8_t addr_val[]) {
     int rc = ble_hs_util_ensure_addr(USE_RANDOM_ADDRESS);
     assert(rc == 0);
 
-    ble_hs_id_infer_auto(CONFIG_USE_RANDOM_ADDRESS, addr_type);
+    ble_hs_id_infer_auto(USE_RANDOM_ADDRESS, addr_type);
     ble_hs_id_copy_addr(*addr_type, addr_val, NULL);
 }
 
