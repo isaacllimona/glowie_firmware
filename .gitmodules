@@ -1,0 +1,3 @@
+[submodule "components/glowy_script/lua"]
+	path = components/glowy_script/lua
+	url = https://github.com/lua/lua.git
