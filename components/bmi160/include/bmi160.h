@@ -6,24 +6,27 @@
 
 #include "bmi160_ll_datatypes.h"
 
-#define BMI160_FIFO_BUFFER_SIZE 1024
+// Sensor fifo has a max capacity of 1024 bytes
+// Data frames take at least 7 bytes
+// More data may be added to the sensor fifo while reading it
+// (1 extra frame at most, unless the fifo read is suspended for a long time)
+#define BMI160_DATA_BUFFER_SIZE ((1024 / 7) + 2)
 
 /**
-* Structure to contain the formatted sensor data
-*/
+ * Structure to contain the formatted sensor data
+ */
 typedef struct {
     enum : uint8_t {
-        CONTAINS_GYRO = 0b01,
-        CONTAINS_ACC = 0b10
+        BMI160_IMU_DATA_CONTAINS_GYRO = 0b01,
+        BMI160_IMU_DATA_CONTAINS_ACC = 0b10
     } flags;
     int16_t gyro[3];
     int16_t acc[3];
-} imu_data_t;
-
+} bmi160_imu_data_t;
 
 /**
  * @brief Initialise the connection to the bmi160 sensor and perform basic checks
-**/
+ **/
 int bmi160_init(void);
 
 void bmi160_soft_reset(void);
@@ -34,9 +37,6 @@ void bmi160_gyro_enable(bmi160_gyro_config_t config, bmi160_gyro_range_t range);
 // ---- FIFO ----
 
 typedef struct {
-    imu_data_t *data_buffer;     //> Buffer for the output data
-    size_t data_buffer_max_size; //> Number of data frames that fit in the buffer
-
     bool acc_filtered;
     bool gyro_filtered;
     uint8_t acc_downsampling;  //> Valid range: 0-7. Actual downsampling ratio is 2^acc_downsampling.
@@ -46,30 +46,14 @@ typedef struct {
 } bmi160_fifo_init_t;
 
 typedef struct {
-    imu_data_t *data_buffer;
-    size_t data_buffer_size;
-
-    size_t data_buffer_max_size;
-
-    uint8_t fifo_buffer[BMI160_FIFO_BUFFER_SIZE];
-    uint8_t *fifo_buffer_cursor;
-    uint8_t *fifo_buffer_end_pos;
-    size_t fifo_buffer_max_size;
+    bmi160_imu_data_t data_buffer[BMI160_DATA_BUFFER_SIZE];
+    size_t data_buffer_size; ///> Number of data frames available in the buffer
+    uint16_t timestamp;      ///> Timestamp of the last data frame
 } bmi160_fifo_t;
 
 void bmi160_fifo_init(bmi160_fifo_t *fifo, bmi160_fifo_init_t *fifo_init);
 
 /**
  *  Read sensor data from the FIFO.
- *
- *  If the previous read didn't process all data in the internal buffer,
- *  the remaining data will be outputted before fetching new data from the sensor.
- *  Use bmi160_fifo_flush to clear the internal buffer and get new sensor data in the next read.
-**/
+ **/
 void bmi160_fifo_read(bmi160_fifo_t *fifo);
-
-/**
- * Clear the internal buffer to get new sensor data in the next read.
- * All data left in the buffer will be lost.
-**/
-void bmi160_fifo_flush(bmi160_fifo_t *fifo);
