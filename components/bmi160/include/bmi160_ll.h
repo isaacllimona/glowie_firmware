@@ -118,6 +118,8 @@ void bmi160_write(bmi160_reg_t addr, uint8_t data);
 uint8_t bmi160_read(bmi160_reg_t addr);
 void bmi160_read_multiple(bmi160_reg_t addr, unsigned int length, void *buffer);
 
+uint8_t bmi160_read_keep_active(bmi160_reg_t addr);
+void bmi160_read_multiple_keep_active(bmi160_reg_t addr, unsigned int length, void *buffer);
 
 // ==== Register access abstractions ====
 

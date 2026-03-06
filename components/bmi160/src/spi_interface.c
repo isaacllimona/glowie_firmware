@@ -14,7 +14,7 @@
 #define SPI_CS_PIN    CONFIG_BMI160_SPI_CS_PIN
 #define SPI_CLOCK_HZ  CONFIG_BMI160_SPI_CLOCK_HZ
 
-spi_device_handle_t device_handle;
+static spi_device_handle_t device_handle;
 
 void bmi160_interface_init(void){
     spi_bus_config_t bus_config = {
@@ -85,7 +85,33 @@ void bmi160_read_multiple(bmi160_reg_t addr, unsigned int length, void *buffer){
         .cmd = BMI160_SPI_CMD_READ,
         .addr = addr,
         .length = length * 8,
-        .rx_buffer = buffer
+        .rx_buffer = buffer,
+    };
+
+    esp_err_t ret = spi_device_transmit(device_handle, &transaction);
+    ESP_ERROR_CHECK(ret);
+}
+
+uint8_t bmi160_read_keep_active(bmi160_reg_t addr) {
+    spi_transaction_t transaction = {
+        .flags = SPI_TRANS_USE_RXDATA | SPI_TRANS_CS_KEEP_ACTIVE,
+        .cmd = BMI160_SPI_CMD_READ,
+        .addr = addr,
+        .length = 8,
+    };
+
+    esp_err_t ret = spi_device_transmit(device_handle, &transaction);
+    ESP_ERROR_CHECK(ret);
+
+    return transaction.rx_data[0];
+}
+
+void bmi160_read_multiple_keep_active(bmi160_reg_t addr, unsigned int length, void *buffer) {
+    spi_transaction_t transaction = {
+        .cmd = BMI160_SPI_CMD_READ | SPI_TRANS_CS_KEEP_ACTIVE,
+        .addr = addr,
+        .length = length * 8,
+        .rx_buffer = buffer,
     };
 
     esp_err_t ret = spi_device_transmit(device_handle, &transaction);
