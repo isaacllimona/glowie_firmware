@@ -1,0 +1,17 @@
+menu "App config"
+
+    menu "WIFI"
+        config WIFI_AP_SSID
+            string "Access point SSID"
+
+        config WIFI_AP_PASSWORD
+            string "Access point password"
+    endmenu
+
+    menu "TCP server"
+        config TCP_PORT
+            int "TCP port"
+            default 3333
+    endmenu
+
+endmenu
