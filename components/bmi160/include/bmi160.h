@@ -8,9 +8,7 @@
 
 // Sensor fifo has a max capacity of 1024 bytes
 // Data frames take at least 7 bytes
-// More data may be added to the sensor fifo while reading it
-// (1 extra frame at most, unless the fifo read is suspended for a long time)
-#define BMI160_DATA_BUFFER_SIZE ((1024 / 7) + 2)
+#define BMI160_DATA_BUFFER_SIZE ((1024 / 7))
 
 /**
  * Structure to contain the formatted sensor data
@@ -48,7 +46,8 @@ typedef struct {
 typedef struct {
     bmi160_imu_data_t data_buffer[BMI160_DATA_BUFFER_SIZE];
     size_t data_buffer_size; ///> Number of data frames available in the buffer
-    uint16_t timestamp;      ///> Timestamp of the last data frame
+    uint8_t skipped_frames;  ///> In case of a fifo overflow, number of frames that have been dropped since the
+                             ///> last readout
 } bmi160_fifo_t;
 
 void bmi160_fifo_init(bmi160_fifo_t *fifo, bmi160_fifo_init_t *fifo_init);
