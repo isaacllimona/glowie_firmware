@@ -1,8 +1,10 @@
 #pragma once
 
-#include <stdint.h>
-#include <stdbool.h>
 #include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
+
+// clang-format off
 
 /**
  * @brief BMI160 register addresses
@@ -103,15 +105,16 @@ typedef enum: uint8_t {
     BMI160_REG_COMMAND         = 0x7E 
 } bmi160_reg_t;
 
+// clang-format on
 
 /**
  * @brief Initialise the interface on the ESP side
-**/
+ **/
 void bmi160_interface_init(void);
 
 /**
  * @brief Set up the interface on the BMI160 side. Must be called again after a BMI160 soft reset.
-**/
+ **/
 void bmi160_interface_start(void);
 
 void bmi160_write(bmi160_reg_t addr, uint8_t data);
@@ -123,15 +126,16 @@ void bmi160_read_multiple_keep_active(bmi160_reg_t addr, unsigned int length, vo
 
 // ==== Register access abstractions ====
 
-static inline void bmi160_ll_fifo_downsampling_write(bool acc_filtered, bool gyro_filtered,
-    uint8_t acc_downsampling,  //> Valid range: 0-7. Actual downsampling ratio is 2^acc_downsampling.
-    uint8_t gyro_downsampling  //> Valid range: 0-7. Actual downsampling ratio is 2^gyro_downsampling.
+static inline void bmi160_ll_fifo_downsampling_write(
+    bool acc_filtered, bool gyro_filtered,
+    uint8_t acc_downsampling, ///> Valid range: 0-7. Actual downsampling ratio is 2^acc_downsampling.
+    uint8_t gyro_downsampling ///> Valid range: 0-7. Actual downsampling ratio is 2^gyro_downsampling.
 ) {
     assert(acc_downsampling < 8);  // Must fit in 3 bits
-    assert(gyro_downsampling < 8);  // Must fit in 3 bits
+    assert(gyro_downsampling < 8); // Must fit in 3 bits
 
-    bmi160_write(BMI160_REG_FIFO_DOWNS,
-        (acc_filtered ? 0x80 : 0x00) | (acc_downsampling << 4) | (gyro_filtered ? 0x08 : 0x00) | (gyro_downsampling));
+    bmi160_write(BMI160_REG_FIFO_DOWNS, (acc_filtered ? 0x80 : 0x00)  | (acc_downsampling << 4) |
+                                        (gyro_filtered ? 0x08 : 0x00) | (gyro_downsampling));
 }
 
 static inline uint16_t bmi160_ll_fifo_length_read() {
