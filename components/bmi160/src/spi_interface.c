@@ -8,15 +8,15 @@
 
 #define SPI_HOST SPI2_HOST
 
-#define SPI_MISO_PIN  CONFIG_BMI160_SPI_MISO_PIN
-#define SPI_MOSI_PIN  CONFIG_BMI160_SPI_MOSI_PIN
-#define SPI_SCLK_PIN  CONFIG_BMI160_SPI_SCLK_PIN
-#define SPI_CS_PIN    CONFIG_BMI160_SPI_CS_PIN
-#define SPI_CLOCK_HZ  CONFIG_BMI160_SPI_CLOCK_HZ
+#define SPI_MISO_PIN CONFIG_BMI160_SPI_MISO_PIN
+#define SPI_MOSI_PIN CONFIG_BMI160_SPI_MOSI_PIN
+#define SPI_SCLK_PIN CONFIG_BMI160_SPI_SCLK_PIN
+#define SPI_CS_PIN   CONFIG_BMI160_SPI_CS_PIN
+#define SPI_CLOCK_HZ CONFIG_BMI160_SPI_CLOCK_HZ
 
 static spi_device_handle_t device_handle;
 
-void bmi160_interface_init(void){
+void bmi160_interface_init(void) {
     spi_bus_config_t bus_config = {
         .miso_io_num = SPI_MISO_PIN,
         .mosi_io_num = SPI_MOSI_PIN,
@@ -43,14 +43,14 @@ void bmi160_interface_init(void){
     bmi160_read(0x7F);
 }
 
-void bmi160_interface_start(void){
+void bmi160_interface_start(void) {
     // Dummy read to create a raising edge in CS, which selects SPI interface in the bmi160
     bmi160_read(0x7F);
 }
 
 enum {
     BMI160_SPI_CMD_WRITE = 0,
-    BMI160_SPI_CMD_READ  = 1
+    BMI160_SPI_CMD_READ = 1,
 };
 
 void bmi160_write(bmi160_reg_t addr, uint8_t data) {
@@ -59,7 +59,7 @@ void bmi160_write(bmi160_reg_t addr, uint8_t data) {
         .cmd = BMI160_SPI_CMD_WRITE,
         .addr = addr,
         .length = 8,
-        .tx_data = {data}
+        .tx_data = {data},
     };
 
     esp_err_t ret = spi_device_transmit(device_handle, &transaction);
@@ -80,7 +80,7 @@ uint8_t bmi160_read(bmi160_reg_t addr) {
     return transaction.rx_data[0];
 }
 
-void bmi160_read_multiple(bmi160_reg_t addr, unsigned int length, void *buffer){
+void bmi160_read_multiple(bmi160_reg_t addr, unsigned int length, void *buffer) {
     spi_transaction_t transaction = {
         .cmd = BMI160_SPI_CMD_READ,
         .addr = addr,

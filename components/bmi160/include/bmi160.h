@@ -1,8 +1,8 @@
 #pragma once
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
 
 #include "bmi160_ll_datatypes.h"
 
@@ -18,7 +18,7 @@
 typedef struct {
     enum : uint8_t {
         BMI160_IMU_DATA_CONTAINS_GYRO = 0b01,
-        BMI160_IMU_DATA_CONTAINS_ACC = 0b10
+        BMI160_IMU_DATA_CONTAINS_ACC = 0b10,
     } flags;
     int16_t gyro[3];
     int16_t acc[3];
@@ -39,8 +39,8 @@ void bmi160_gyro_enable(bmi160_gyro_config_t config, bmi160_gyro_range_t range);
 typedef struct {
     bool acc_filtered;
     bool gyro_filtered;
-    uint8_t acc_downsampling;  //> Valid range: 0-7. Actual downsampling ratio is 2^acc_downsampling.
-    uint8_t gyro_downsampling; //> Valid range: 0-7. Actual downsampling ratio is 2^gyro_downsampling.
+    uint8_t acc_downsampling;  ///> Valid range: 0-7. Actual downsampling ratio is 2^acc_downsampling.
+    uint8_t gyro_downsampling; ///> Valid range: 0-7. Actual downsampling ratio is 2^gyro_downsampling.
 
     uint8_t fifo_watermark;
 } bmi160_fifo_init_t;
