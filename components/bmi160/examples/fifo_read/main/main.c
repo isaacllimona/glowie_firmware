@@ -2,7 +2,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "bmi160.h"
+#include "bmi160/bmi160.h"
+#include "bmi160/fifo.h"
 
 #define LOG_TAG "main"
 

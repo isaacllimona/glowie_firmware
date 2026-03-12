@@ -1,5 +1,7 @@
 #include "esp_log.h"
-#include "bmi160.h"
+
+#include "bmi160/bmi160.h"
+#include "bmi160/ll/interface.h"
 
 #define LOG_TAG "main"
 

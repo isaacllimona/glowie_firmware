@@ -6,7 +6,8 @@
 #include "freertos/message_buffer.h"
 #include "portmacro.h"
 
-#include "bmi160.h"
+#include "bmi160/bmi160.h"
+#include "bmi160/fifo.h"
 
 #define LOG_TAG "imu_read"
 #define DELAY_MS(t) vTaskDelay(t/portTICK_PERIOD_MS)

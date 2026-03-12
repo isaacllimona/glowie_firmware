@@ -1,48 +1,39 @@
-#include "bmi160_ll.h"
-#include "bmi160_ll_datatypes.h"
+#include "bmi160/ll/interface.h"
+#include "bmi160/ll/datatypes.h"
 #include "log.h"
 
-#include "bmi160.h"
+// Implements
+#include "bmi160/fifo.h"
 
 #define FIFO_BUFFER_SIZE 1024
 
-void bmi160_fifo_init(bmi160_fifo_t *fifo, bmi160_fifo_init_t *fifo_init) {
-    assert(fifo_init->acc_downsampling < 8);  // Must fit in 3 bits
-    assert(fifo_init->gyro_downsampling < 8); // Must fit in 3 bits
+// =============================
+//       Register access 
 
-    fifo->data_buffer_size = 0;
+static void write_fifo_downsampling(
+    bool acc_filtered, bool gyro_filtered,
+    uint8_t acc_downsampling, ///> Valid range: 0-7. Actual downsampling ratio is 2^acc_downsampling.
+    uint8_t gyro_downsampling ///> Valid range: 0-7. Actual downsampling ratio is 2^gyro_downsampling.
+) {
+    assert(acc_downsampling < 8);  // Must fit in 3 bits
+    assert(gyro_downsampling < 8); // Must fit in 3 bits
 
-    bmi160_ll_fifo_downsampling_write(fifo_init->acc_filtered, fifo_init->gyro_filtered,
-                                      fifo_init->acc_downsampling, fifo_init->gyro_downsampling);
-
-    bmi160_write(BMI160_REG_FIFO_CONFIG_0, fifo_init->fifo_watermark);
-    bmi160_write(BMI160_REG_FIFO_CONFIG_1, 0xD0); // Enable acc, gyro. Set header mode.
-
-    bmi160_write(BMI160_REG_COMMAND, BMI160_CMD_FIFO_FLUSH);
-
-    // CHECK FOR ERRORS
-    uint8_t err = bmi160_read(BMI160_REG_ERR_REG);
-    if (err != 0) {
-        LOGE("Error: %x", err);
-    }
+    bmi160_write(BMI160_REG_FIFO_DOWNS, (acc_filtered ? 0x80 : 0x00)  | (acc_downsampling << 4) |
+                                        (gyro_filtered ? 0x08 : 0x00) | (gyro_downsampling));
 }
 
-static uint16_t read_fifo(uint8_t *out_buffer);
-static void parse_fifo(uint8_t *fifo_buffer, uint16_t fifo_buffer_len, bmi160_fifo_t *fifo);
-
-void bmi160_fifo_read(bmi160_fifo_t *fifo) {
-    uint8_t fifo_buffer[FIFO_BUFFER_SIZE];
-    uint16_t read_len = read_fifo(fifo_buffer);
-    parse_fifo(fifo_buffer, read_len, fifo);
+static uint16_t read_fifo_length() {
+    uint8_t fifo_length_regs[2];
+    bmi160_read_multiple(BMI160_REG_FIFO_LENGTH, 2, fifo_length_regs);
+    return ((uint16_t)(fifo_length_regs[1] & 0x07) << 8) + fifo_length_regs[0];
 }
 
-static uint16_t read_fifo(uint8_t *out_buffer) {
-    uint16_t read_len = bmi160_ll_fifo_length_read();
-    if (read_len == 0)
-        return 0;
-    bmi160_ll_fifo_data_read(out_buffer, read_len);
-    return read_len;
+static void read_fifo_data(uint8_t *out_buffer, size_t len) {
+    bmi160_read_multiple(BMI160_REG_FIFO_DATA, len, out_buffer);
 }
+
+// =============================
+//        FIFO parsing
 
 static void parse_fifo(uint8_t *fifo_buffer, uint16_t fifo_buffer_len, bmi160_fifo_t *fifo) {
     if (fifo_buffer_len == 0) {
@@ -123,4 +114,37 @@ static void parse_fifo(uint8_t *fifo_buffer, uint16_t fifo_buffer_len, bmi160_fi
             break;
         }
     }
+}
+
+// =============================
+//       Public functions
+
+void bmi160_fifo_init(bmi160_fifo_t *fifo, bmi160_fifo_init_t *fifo_init) {
+    assert(fifo_init->acc_downsampling < 8);  // Must fit in 3 bits
+    assert(fifo_init->gyro_downsampling < 8); // Must fit in 3 bits
+
+    fifo->data_buffer_size = 0;
+
+    write_fifo_downsampling(fifo_init->acc_filtered, fifo_init->gyro_filtered,
+                                      fifo_init->acc_downsampling, fifo_init->gyro_downsampling);
+
+    bmi160_write(BMI160_REG_FIFO_CONFIG_0, fifo_init->fifo_watermark);
+    bmi160_write(BMI160_REG_FIFO_CONFIG_1, 0xD0); // Enable acc, gyro. Set header mode.
+
+    bmi160_write(BMI160_REG_COMMAND, BMI160_CMD_FIFO_FLUSH);
+
+    // CHECK FOR ERRORS
+    uint8_t err = bmi160_read(BMI160_REG_ERR_REG);
+    if (err != 0) {
+        LOGE("Error: %x", err);
+    }
+}
+
+void bmi160_fifo_read(bmi160_fifo_t *fifo) {
+    uint8_t fifo_buffer[FIFO_BUFFER_SIZE];
+    uint16_t read_len = read_fifo_length();
+    if (read_len != 0) {
+        read_fifo_data(fifo_buffer, read_len);
+    }
+    parse_fifo(fifo_buffer, read_len, fifo);
 }

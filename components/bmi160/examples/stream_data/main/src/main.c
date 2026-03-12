@@ -5,7 +5,7 @@
 #include "freertos/message_buffer.h"
 #include "portmacro.h"
 
-#include "bmi160.h"
+#include "bmi160/imu_data.h"
 
 #define SENSOR_FIFO_BUFFER_SIZE (1024)
 #define IMU_DATA_BUFFER_SIZE (SENSOR_FIFO_BUFFER_SIZE / 7)  // Each data frame in the buffer will be at least 7 bytes long

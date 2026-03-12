@@ -4,7 +4,8 @@
 #include "hal/spi_types.h"
 #include "sdkconfig.h"
 
-#include "bmi160_ll.h"
+// implements
+#include "bmi160/ll/interface.h"
 
 #define SPI_HOST SPI2_HOST
 
