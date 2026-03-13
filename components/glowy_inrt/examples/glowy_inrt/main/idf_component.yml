@@ -1,0 +1,9 @@
+dependencies:
+  glowy_inrt:
+    path: ../../../
+  glowy_led:
+    path: ../../../../glowy_led
+  glowy_common:
+    path: ../../../../glowy_common
+  bmi160:
+    path: ../../../../bmi160
