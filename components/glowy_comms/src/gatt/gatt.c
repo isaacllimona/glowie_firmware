@@ -1,7 +1,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "esp_log.h"
+#include "log.h"
 
 #include "host/ble_att.h"
 #include "host/ble_gatt.h"
@@ -130,7 +130,7 @@ static int on_enable_write(uint16_t conn_handle, uint16_t attr_handle, struct bl
     uint8_t val = ctxt->om->om_data[0];
     if (val > 1) return 0xFF;  // value out of range (accept only 0 or 1)
 
-    ESP_LOGD(TAG, "Received write to onoff characteristic. Value: %d", val);
+    LOGD("Received write to onoff characteristic. Value: %d", val);
     callbacks.set_enable_cb(val);
 
     return 0;
@@ -142,7 +142,7 @@ static int on_brightness_write(uint16_t conn_handle, uint16_t attr_handle, struc
     if(ctxt->om->om_len != 1) return BLE_ATT_ERR_INVALID_ATTR_VALUE_LEN;
 
     uint8_t val = ctxt->om->om_data[0];
-    ESP_LOGD(TAG, "Received write to brightness characteristic. Value: %d", val);
+    LOGD("Received write to brightness characteristic. Value: %d", val);
     callbacks.set_brightness_cb(val);
 
     return 0;
@@ -157,7 +157,7 @@ static int on_rgb_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_g
     int g = ctxt->om->om_data[1];
     int b = ctxt->om->om_data[2];
 
-    ESP_LOGD(TAG, "Received write to rgb characteristic. Value: %d, %d, %d", r, g, b);
+    LOGD("Received write to rgb characteristic. Value: %d, %d, %d", r, g, b);
     callbacks.set_color_rgb_cb(r, g, b);
 
     return 0;
@@ -177,7 +177,7 @@ static int on_script_in(uint16_t conn_handle, uint16_t attr_handle, struct ble_g
     }
     input_buffer[written_len] = 0;
 
-    ESP_LOGD(TAG, "Received %u bytes of script input: %s", written_len, input_buffer);
+    LOGD("Received %u bytes of script input: %s", written_len, input_buffer);
 
     if(callbacks.script_in_cb(input_buffer)) return 0;
     else return 0xFE;

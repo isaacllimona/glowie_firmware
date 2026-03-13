@@ -1,3 +1,5 @@
 dependencies:
   bmi160:
     path: ../../../
+  glowy_common:
+    path: ../../../../glowy_common

@@ -1,33 +1,29 @@
-#include "esp_log.h"
-
 #include "nimble/nimble_port.h"
 #include "nimble/nimble_port_freertos.h"
 #include "host/ble_hs.h"
 
+#include "log.h"
 #include "gatt/gatt.h"
 #include "gap/gap.h"
 
 #include "glowy_comms.h"
 
-
-#define TAG "comms"
-
 void ble_store_config_init(void);
 
 static void on_reset(int reason) {
-    ESP_LOGW(TAG, "Resetting BLE stack; reason=%d\n", reason);
+    LOGW("Resetting BLE stack; reason=%d\n", reason);
 }
 
 static void on_sync(void) {
-    ESP_LOGI(TAG, "BLE stack synchronized");
+    LOGI("BLE stack synchronized");
     gap_start();
 }
 
 static void host_task(void *param) {
-    ESP_LOGI(TAG, "BLE host task started");
+    LOGI("BLE host task started");
     nimble_port_run();
 
-    ESP_LOGE(TAG, "BLE host stopped");
+    LOGE("BLE host stopped");
     nimble_port_freertos_deinit();
 }
 

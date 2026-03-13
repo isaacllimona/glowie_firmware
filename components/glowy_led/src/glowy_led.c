@@ -1,12 +1,12 @@
 #include <stdbool.h>
 
-#include "esp_log.h"
 #include "led_strip.h"
 #include "sdkconfig.h"
+#include "glowy_common/log.h" // IWYU pragma: export
 
 #include "glowy_led.h"
 
-#define TAG "glowy_led"
+SET_LOG_TAG("glowy_led");
 
 #define LED_GPIO CONFIG_GLOWY_LED_GPIO
 #define LED_NUM CONFIG_GLOWY_LED_NUM
@@ -47,11 +47,11 @@ static inline void update(void) {
     esp_err_t ret;
     for(int i = 0; i < LED_NUM; i++){
         ret = led_strip_set_pixel(led_handle, i, red, green, blue);
-        if(ret != ESP_OK) ESP_LOGE(TAG, "Error setting pixel number %d, code: %d", i, ret);
+        if(ret != ESP_OK) LOGE("Error setting pixel number %d, code: %d", i, ret);
     }
 
     ret = led_strip_refresh(led_handle);
-    if(ret != ESP_OK) ESP_LOGE(TAG, "Error refreshing LEDs, code: %d", ret);
+    if(ret != ESP_OK) LOGE("Error refreshing LEDs, code: %d", ret);
 }
 
 void glowy_led_set_enabled(bool new_enabled){

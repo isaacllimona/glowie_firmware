@@ -1,4 +1,4 @@
-#include "esp_log.h"
+#include "log.h"
 
 #include "nimble/ble.h"
 #include "host/ble_hs.h"
@@ -42,7 +42,7 @@ static void advertisement_setup(void) {
 
     char addr_str[18] = {0};
     format_addr(addr_str, addr_val);
-    ESP_LOGI(TAG, "Using device address: %s", addr_str);
+    LOGI("Using device address: %s", addr_str);
 
     const char *name = CONFIG_DEVICE_NAME;
     const struct ble_hs_adv_fields fields = {
@@ -67,7 +67,7 @@ static void advertisement_setup(void) {
 }
 
 static void advertisement_start(void) {
-    ESP_LOGI(TAG, "Starting advertisement");
+    LOGI("Starting advertisement");
     struct ble_gap_adv_params adv_params = {
         .conn_mode = BLE_GAP_CONN_MODE_UND,
         .disc_mode = BLE_GAP_DISC_MODE_GEN,
@@ -80,23 +80,23 @@ static int log_connection_details(uint16_t conn_handle) {
     struct ble_gap_conn_desc desc;
     int rc = ble_gap_conn_find(conn_handle, &desc);
     if(rc != 0) {
-        ESP_LOGE(TAG, "failed to find connection by handle, error code: %d", rc);
+        LOGE("failed to find connection by handle, error code: %d", rc);
         return rc;
     }
 
     char addr_str[18] = {0};
 
-    ESP_LOGI(TAG, "connection handle: %d", desc.conn_handle);
+    LOGI("connection handle: %d", desc.conn_handle);
 
     format_addr(addr_str, desc.our_id_addr.val);
-    ESP_LOGI(TAG, "device id address: type=%d, value=%s",
+    LOGI("device id address: type=%d, value=%s",
              desc.our_id_addr.type, addr_str);
 
     format_addr(addr_str, desc.peer_id_addr.val);
-    ESP_LOGI(TAG, "peer id address: type=%d, value=%s", desc.peer_id_addr.type,
+    LOGI("peer id address: type=%d, value=%s", desc.peer_id_addr.type,
              addr_str);
 
-    ESP_LOGI(TAG,
+    LOGI(
              "conn_itvl=%d, conn_latency=%d, supervision_timeout=%d, "
              "encrypted=%d, authenticated=%d, bonded=%d\n",
              desc.conn_itvl, desc.conn_latency, desc.supervision_timeout,
@@ -109,7 +109,7 @@ static int log_connection_details(uint16_t conn_handle) {
 static int on_gap_event(struct ble_gap_event *event, void *arg) {
     switch(event->type) {
         case BLE_GAP_EVENT_CONNECT:
-            ESP_LOGI(TAG, "connection %s", event->connect.status == 0 ? "established" : "failed");
+            LOGI("connection %s", event->connect.status == 0 ? "established" : "failed");
             if(event->connect.status == 0) {
                 int rc = log_connection_details(event->connect.conn_handle);
                 return rc;
@@ -120,22 +120,22 @@ static int on_gap_event(struct ble_gap_event *event, void *arg) {
             }
 
         case BLE_GAP_EVENT_DISCONNECT:
-            ESP_LOGI(TAG, "disconnected from peer; reason=%d", event->disconnect.reason);
+            LOGI("disconnected from peer; reason=%d", event->disconnect.reason);
             advertisement_start();
             return 0;
 
         case BLE_GAP_EVENT_CONN_UPDATE:
-            ESP_LOGI(TAG, "connection updated; status=%d", event->conn_update.status);
+            LOGI("connection updated; status=%d", event->conn_update.status);
             int rc = log_connection_details(event->connect.conn_handle);
             return rc;
 
         case BLE_GAP_EVENT_ADV_COMPLETE:
-            ESP_LOGI(TAG, "advertise complete; reason=%d", event->adv_complete.reason);
+            LOGI("advertise complete; reason=%d", event->adv_complete.reason);
             advertisement_start();
             return 0;
 
         default:
-            ESP_LOGI(TAG, "unhandled GAP event; type=%d", event->type);
+            LOGI("unhandled GAP event; type=%d", event->type);
             return 0;
 
     }

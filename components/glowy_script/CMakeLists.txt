@@ -42,6 +42,7 @@ idf_component_register(
     SRCS ${lua_srcs} ${lua_libs} "src/glowy_script.c" "src/glowy_script_freertos.c"
     INCLUDE_DIRS "include"
     PRIV_INCLUDE_DIRS "lua" "src"
+    PRIV_REQUIRES glowy_common
 )
 
 add_compile_definitions(LUA_32BITS=1)
