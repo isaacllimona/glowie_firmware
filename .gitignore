@@ -11,3 +11,10 @@ dev_shell.sh
 .vscode
 .clangd
 local/
+
+# python
+.venv
+__pycache__
+
+# python host script
+.glw_history
