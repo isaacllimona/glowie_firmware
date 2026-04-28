@@ -1,0 +1,9 @@
+dependencies:
+  glw_inrt:
+    path: ../../../
+  glw_led:
+    path: ../../../../glw_led
+  glw_common:
+    path: ../../../../glw_common
+  bmi160:
+    path: ../../../../bmi160

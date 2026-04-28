@@ -1,0 +1,15 @@
+menu "Communication"
+
+    config DEVICE_NAME
+        string "Name of the BLE device"
+        default "glowie"
+
+    config USE_RANDOM_ADDRESS
+        bool "Use random BLE address"
+        default n
+
+    config COMMS_SCRIPT_IN_BUFFER_SIZE
+        int "Size of the script input buffer"
+        default 252
+
+endmenu

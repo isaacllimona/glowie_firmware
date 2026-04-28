@@ -1,8 +1,8 @@
 #include "nvs_flash.h"
 
-#include "glowy_comms.h"
-#include "glowy_led.h"
-#include "glowy_script.h"
+#include "glw_comms.h"
+#include "glw_led.h"
+#include "glw_script.h"
 
 #define LOG_TAG "main"
 
@@ -14,24 +14,24 @@ void app_main(void) {
     }
     ESP_ERROR_CHECK(ret);
 
-    glowy_led_init();
+    glw_led_init();
 
-    const glowy_comms_init_t comms_init_struct = {
+    const glw_comms_init_t comms_init_struct = {
         .callbacks = {
-            .set_enable_cb = glowy_led_set_enabled,
-            .set_brightness_cb = glowy_led_set_brightness,
-            .set_color_rgb_cb = glowy_led_set_color,
+            .set_enable_cb = glw_led_set_enabled,
+            .set_brightness_cb = glw_led_set_brightness,
+            .set_color_rgb_cb = glw_led_set_color,
 
-            .script_in_cb = glowy_script_run_string
+            .script_in_cb = glw_script_run_string
         }
     };
-    glowy_comms_init(comms_init_struct);
+    glw_comms_init(comms_init_struct);
 
     const lua_led_lib_cfg_t led_lib_cfg = {
-        .set_color_rgb = glowy_led_set_color,
-        .set_color_hsv = glowy_led_set_color_hsv,
+        .set_color_rgb = glw_led_set_color,
+        .set_color_hsv = glw_led_set_color_hsv,
     };
     lua_led_lib_cfg(&led_lib_cfg);
     
-    glowy_script_start();
+    glw_script_start();
 }

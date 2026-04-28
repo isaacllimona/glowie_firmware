@@ -1,5 +1,0 @@
-idf_component_register(
-    SRCS "src/glowy_led.c"
-    INCLUDE_DIRS "include"
-    PRIV_REQUIRES led_strip glowy_common
-)
