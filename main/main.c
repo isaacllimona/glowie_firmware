@@ -3,10 +3,11 @@
 #include "glw_comms.h"
 #include "glw_led.h"
 #include "glw_script.h"
-
-#define LOG_TAG "main"
+#include "glw_sys.h"
 
 void app_main(void) {
+    glw_sys_init();
+
     esp_err_t ret = nvs_flash_init();
     if(ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
