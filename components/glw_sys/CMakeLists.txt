@@ -1,6 +1,16 @@
-idf_component_register(
-    SRCS "src/glw_sys.c"
-    INCLUDE_DIRS "include"
-    PRIV_INCLUDE_DIRS "src"
-    PRIV_REQUIRES glw_common esp_driver_gpio
+set(TARGET glw_sys)
+
+add_library(${TARGET} STATIC
+    src/glw_sys.c
 )
+
+target_include_directories(${TARGET}
+    PUBLIC include
+    PRIVATE src
+)
+
+target_link_libraries(${TARGET} PRIVATE
+    glw_log
+)
+
+link_idf_components(${TARGET} PRIVATE esp_driver_gpio)

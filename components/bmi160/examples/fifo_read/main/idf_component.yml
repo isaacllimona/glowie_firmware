@@ -1,5 +1,0 @@
-dependencies:
-  bmi160:
-    path: ../../../
-  glw_common:
-    path: ../../../../glw_common

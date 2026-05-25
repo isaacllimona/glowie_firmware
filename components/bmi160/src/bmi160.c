@@ -1,13 +1,9 @@
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
 #include "bmi160/ll/interface.h"
+#include "os.h"
 #include "log.h"
 
 // implements
 #include "bmi160/bmi160.h"
-
-#define DELAY_MS(t) vTaskDelay(t / portTICK_PERIOD_MS)
 
 int bmi160_init(void) {
     bmi160_interface_init();

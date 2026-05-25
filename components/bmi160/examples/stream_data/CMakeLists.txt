@@ -1,8 +1,17 @@
-# The following five lines of boilerplate have to be in your project's
-# CMakeLists in this exact order for cmake to work correctly
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.22)
 
-set(COMPONENTS "main")
-include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+include($ENV{IDF_PATH}/tools/cmakev2/idf.cmake)
 
-project(example_bmi160_stream_data)
+set(project example_bmi160_stream_data)
+
+project(${project} C CXX ASM)
+
+set(glowie_project_dir "../../../..") 
+include(${glowie_project_dir}/tools/buildsystem/cmake/idf_utils.cmake)
+
+idf_project_default()
+
+set(libs_dir "../../..")
+add_subdirectory(${libs_dir}/bmi160  build/libs/bmi160)
+add_subdirectory(${libs_dir}/glw_os  build/libs/glw_os)
+add_subdirectory(${libs_dir}/glw_log build/libs/glw_log)

@@ -1,0 +1,3 @@
+#pragma once
+
+#define CONFIG_SCRIPT_INPUT_BUFFER_SIZE 252

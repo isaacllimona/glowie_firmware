@@ -9,7 +9,7 @@
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
 
-#include "sdkconfig.h"
+#include "config.h"
 #include "glw_comms.h"
 #include "uuid.h"
 #include "gatt.h"

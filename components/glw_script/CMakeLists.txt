@@ -1,3 +1,5 @@
+set(TARGET glw_script)
+
 set(lua_srcs
     "lua/lapi.c"
     "lua/lauxlib.c"
@@ -38,11 +40,22 @@ set(lua_libs
     "src/lua_libs/lua_sys_lib.c"
 )
 
-idf_component_register(
-    SRCS ${lua_srcs} ${lua_libs} "src/glw_script.c" "src/glw_script_freertos.c"
-    INCLUDE_DIRS "include"
-    PRIV_INCLUDE_DIRS "lua" "src"
-    PRIV_REQUIRES glw_common
+add_library(${TARGET} STATIC
+    ${lua_srcs}
+    ${lua_libs}
+    src/glw_script.c
+    src/glw_script_freertos.c
+)
+
+target_include_directories(${TARGET}
+    PUBLIC include
+    PRIVATE lua src
+)
+
+target_link_libraries(${TARGET} PRIVATE
+    glw_log
 )
 
 add_compile_definitions(LUA_32BITS=1)
+
+link_idf_components(${TARGET} PRIVATE freertos)

@@ -1,15 +1,16 @@
 #include <stdbool.h>
 
+#include "glw_log.h" // IWYU pragma: export
+
 #include "led_strip.h"
-#include "sdkconfig.h"
-#include "glw_common/log.h" // IWYU pragma: export
+#include "config.h"
 
 #include "glw_led.h"
 
 SET_LOG_TAG("glw_led");
 
-#define LED_GPIO 9 //CONFIG_GLW_LED_GPIO
-#define LED_NUM 16 //CONFIG_GLW_LED_NUM
+#define LED_GPIO CONFIG_GLW_LED_GPIO
+#define LED_NUM  CONFIG_GLW_LED_NUM
 
 #define LED_BRIGHTNESS_MAX 255
 

@@ -1,4 +1,4 @@
-#include "glw_common/os/mutex.h"
+#include "glw_os/mutex.h"
 
 // implements
 #include "glw_inrt/data_dispatcher.h"

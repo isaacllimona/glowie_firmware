@@ -1,6 +1,22 @@
-idf_component_register(
-    SRCS "src/glw_inrt.c" "src/state_estimation.c" "src/data_dispatcher.c" "src/imu/imu_bmi160.c" "src/task.c"
-    INCLUDE_DIRS "include"
-    PRIV_INCLUDE_DIRS "src"
-    PRIV_REQUIRES bmi160 glw_common
+set(TARGET glw_inrt)
+
+set(SOURCES
+    src/glw_inrt.c
+    src/state_estimation.c
+    src/data_dispatcher.c
+    src/imu/imu_bmi160.c
+    src/task.c
+)
+
+add_library(${TARGET} STATIC ${SOURCES})
+
+target_include_directories(${TARGET}
+    PUBLIC include
+    PRIVATE src
+)
+
+target_link_libraries(${TARGET} PRIVATE
+    bmi160
+    glw_os
+    glw_log
 )

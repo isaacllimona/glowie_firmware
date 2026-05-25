@@ -1,8 +1,8 @@
 #pragma once
 
 #include <stdbool.h>
-#include "sdkconfig.h"
 
+#include "config.h"
 #include "lua.h"
 
 #define INPUT_BUFFER_SIZE CONFIG_SCRIPT_INPUT_BUFFER_SIZE

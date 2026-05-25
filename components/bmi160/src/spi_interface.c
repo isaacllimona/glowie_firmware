@@ -2,7 +2,8 @@
 #include "driver/spi_master.h"
 #include "esp_err.h"
 #include "hal/spi_types.h"
-#include "sdkconfig.h"
+
+#include "config.h"
 
 // implements
 #include "bmi160/ll/interface.h"

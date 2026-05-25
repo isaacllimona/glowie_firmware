@@ -4,7 +4,7 @@
 #include "host/ble_hs.h"
 #include "host/util/util.h"
 
-#include "sdkconfig.h"
+#include "config.h"
 
 #include "uuid.h"
 #include "gap.h"

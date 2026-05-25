@@ -1,5 +1,19 @@
-idf_component_register(
-    SRCS "main.c"
-    INCLUDE_DIRS "."
-    PRIV_REQUIRES nvs_flash glw_comms glw_led glw_script glw_sys
+if(DEFINED COMPONENT_TARGET)
+    set(TARGET ${COMPONENT_TARGET})
+else()
+    set(TARGET main)
+endif()
+
+add_library(${TARGET} STATIC
+    main.c
 )
+
+target_link_libraries(${TARGET} PRIVATE
+    glw_log
+    glw_comms
+    glw_led
+    glw_sys
+    glw_script
+)
+
+link_idf_components(${TARGET} PRIVATE nvs_flash)

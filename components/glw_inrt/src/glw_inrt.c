@@ -1,6 +1,6 @@
 #include <stddef.h>
 
-#include "glw_common/os/time.h"
+#include "glw_os/time.h"
 
 #include "data_dispatcher_priv.h"
 #include "imu/imu.h"

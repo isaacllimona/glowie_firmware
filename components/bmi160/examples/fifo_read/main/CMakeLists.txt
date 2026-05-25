@@ -1,5 +1,9 @@
-idf_component_register(
-    SRCS "main.c"
-    INCLUDE_DIRS "."
-    PRIV_REQUIRES bmi160
+set(TARGET ${COMPONENT_TARGET})
+
+add_library(${TARGET} STATIC
+    main.c
 )
+
+target_link_libraries(${TARGET} PRIVATE bmi160)
+
+link_idf_components(${TARGET} PRIVATE freertos log)
