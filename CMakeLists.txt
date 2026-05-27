@@ -5,6 +5,8 @@ include($ENV{IDF_PATH}/tools/cmakev2/idf.cmake)
 project(glowie C CXX ASM)
 
 include(tools/buildsystem/cmake/idf_utils.cmake)
+include(tools/buildsystem/cmake/modules.cmake)
+
 idf_project_default()
 
 add_subdirectory(components/bmi160)

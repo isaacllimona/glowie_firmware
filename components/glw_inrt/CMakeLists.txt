@@ -8,15 +8,7 @@ set(SOURCES
     src/task.c
 )
 
-add_library(${TARGET} STATIC ${SOURCES})
-
-target_include_directories(${TARGET}
-    PUBLIC include
-    PRIVATE src
-)
-
-target_link_libraries(${TARGET} PRIVATE
-    bmi160
-    glw_os
-    glw_log
+glw_add_module(${TARGET}
+    SOURCES ${SOURCES}
+    DEPENDS glw_log glw_os bmi160
 )

@@ -40,22 +40,16 @@ set(lua_libs
     "src/lua_libs/lua_sys_lib.c"
 )
 
-add_library(${TARGET} STATIC
-    ${lua_srcs}
-    ${lua_libs}
-    src/glw_script.c
-    src/glw_script_freertos.c
+glw_add_module(${TARGET}
+    SOURCES
+        ${lua_srcs}
+        ${lua_libs}
+        src/glw_script.c
+        src/glw_script_freertos.c
+    INCLUDE_PRIVATE lua src
+    DEPENDS glw_log
 )
 
-target_include_directories(${TARGET}
-    PUBLIC include
-    PRIVATE lua src
-)
-
-target_link_libraries(${TARGET} PRIVATE
-    glw_log
-)
-
-add_compile_definitions(LUA_32BITS=1)
+target_compile_definitions(${TARGET} PRIVATE LUA_32BITS=1)
 
 link_idf_components(${TARGET} PRIVATE freertos)

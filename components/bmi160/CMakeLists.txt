@@ -1,3 +1,4 @@
+# This allows this module to be discovered as an idf component
 if(DEFINED COMPONENT_TARGET)
     set(TARGET ${COMPONENT_TARGET})
 else()
@@ -10,16 +11,9 @@ set(SOURCES
     src/fifo.c
 )
 
-add_library(${TARGET} STATIC ${SOURCES})
-
-target_include_directories(${TARGET}
-    PUBLIC include
-    PRIVATE src
-)
-
-target_link_libraries(${TARGET} PRIVATE
-    glw_os
-    glw_log
+glw_add_module(${TARGET}
+    SOURCES "${SOURCES}"
+    DEPENDS glw_os glw_log
 )
 
 link_idf_components(${TARGET} PRIVATE esp_driver_spi)
