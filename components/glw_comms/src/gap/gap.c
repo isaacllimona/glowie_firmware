@@ -56,8 +56,8 @@ static void advertisement_setup(void) {
         .name_len = strlen(name),
         .name_is_complete = 1,
 
-        .tx_pwr_lvl = BLE_HS_ADV_TX_PWR_LVL_AUTO,
-        .tx_pwr_lvl_is_present = 1,
+        // .tx_pwr_lvl = BLE_HS_ADV_TX_PWR_LVL_AUTO,
+        // .tx_pwr_lvl_is_present = 1,
     };
 
     int rc = ble_gap_adv_set_fields(&fields);
