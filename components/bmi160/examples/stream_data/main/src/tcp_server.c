@@ -137,6 +137,25 @@ static void on_wifi_event_got_ip(){
     xTaskNotify(tcp_server_task_handle, 1, eNoAction);
 }
 
+static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void* event_data) {
+    if (event_base == WIFI_EVENT) {
+        switch(event_id) {
+            case WIFI_EVENT_STA_START:
+                on_wifi_event_start();
+                break;
+            case WIFI_EVENT_STA_CONNECTED:
+                on_wifi_event_connected();
+                break;
+            case WIFI_EVENT_STA_DISCONNECTED:
+                on_wifi_event_disconnected();
+                break;
+        }
+    }
+    else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
+        on_wifi_event_got_ip();
+    }
+}
+
 void tcp_server_start(MessageBufferHandle_t message_buffer) {
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
@@ -147,20 +166,12 @@ void tcp_server_start(MessageBufferHandle_t message_buffer) {
     ESP_ERROR_CHECK(esp_wifi_init(&wifi_init_config));
 
     esp_event_handler_register(
-        WIFI_EVENT, WIFI_EVENT_STA_START,
-        on_wifi_event_start, NULL
-    );
-    esp_event_handler_register(
-        WIFI_EVENT, WIFI_EVENT_STA_CONNECTED,
-        on_wifi_event_connected, NULL
-    );
-    esp_event_handler_register(
-        WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED,
-        on_wifi_event_disconnected, NULL
+        WIFI_EVENT, ESP_EVENT_ANY_ID,
+        event_handler, NULL
     );
     esp_event_handler_register(
         IP_EVENT, IP_EVENT_STA_GOT_IP,
-        on_wifi_event_got_ip, NULL
+        event_handler, NULL
     );
 
     wifi_config_t wifi_config = {.sta = {
