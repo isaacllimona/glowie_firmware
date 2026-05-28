@@ -1,3 +1,5 @@
+glw_exclude_from_native_build()
+
 set(TARGET glw_comms)
 
 glw_add_module(${TARGET}

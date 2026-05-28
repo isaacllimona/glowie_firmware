@@ -1,3 +1,5 @@
+glw_exclude_from_native_build()
+
 # This allows this module to be discovered as an idf component
 if(DEFINED COMPONENT_TARGET)
     set(TARGET ${COMPONENT_TARGET})

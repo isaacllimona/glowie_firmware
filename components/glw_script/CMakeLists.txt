@@ -1,3 +1,5 @@
+glw_exclude_from_native_build()
+
 set(TARGET glw_script)
 
 set(lua_srcs
@@ -50,6 +52,8 @@ glw_add_module(${TARGET}
     DEPENDS glw_log
 )
 
-target_compile_definitions(${TARGET} PRIVATE LUA_32BITS=1)
+if(NOT BUILD_NATIVE)
+    target_compile_definitions(${TARGET} PRIVATE LUA_32BITS=1)
+endif()
 
 link_idf_components(${TARGET} PRIVATE freertos)

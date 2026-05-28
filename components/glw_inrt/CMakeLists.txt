@@ -1,3 +1,5 @@
+glw_exclude_from_native_build()
+
 set(TARGET glw_inrt)
 
 set(SOURCES

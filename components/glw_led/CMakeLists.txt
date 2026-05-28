@@ -1,3 +1,5 @@
+glw_exclude_from_native_build()
+
 # Build the led_strip component
 add_subdirectory(led_strip)
 

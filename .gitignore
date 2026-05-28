@@ -1,5 +1,6 @@
 # build files
 build/
+build_native/
 .cache
 sdkconfig
 sdkconfig.old
@@ -10,6 +11,7 @@ managed_components
 dev_shell.sh
 .vscode
 .clangd
+.zed
 local/
 
 # python

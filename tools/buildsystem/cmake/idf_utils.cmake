@@ -1,4 +1,8 @@
 function(link_idf_components target)
+    if(BUILD_NATIVE)
+        return()
+    endif()
+
     cmake_parse_arguments(ARG "" "" "PUBLIC;PRIVATE" ${ARGN})
 
     message(DEBUG "GLOWIE: Linking components: (public:) ${ARG_PUBLIC}, (private:) ${ARG_PRIVATE} -- to target ${target}")
