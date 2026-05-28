@@ -14,6 +14,7 @@ target_link_libraries(${TARGET} PRIVATE
     glw_led
     glw_sys
     glw_script
+    glw_commands
 )
 
 link_idf_components(${TARGET} PRIVATE nvs_flash)

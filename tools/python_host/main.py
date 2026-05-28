@@ -11,7 +11,7 @@ def main():
         multiline=True,
         message="> ",
         prompt_continuation="+ ",
-        lexer=PygmentsLexer(LuaLexer)
+        lexer=PygmentsLexer(LuaLexer),
     )
 
     print("Looking for glowies in the wild...")
@@ -28,10 +28,11 @@ def main():
         print("Press Esc + Enter to send script")
         while True:
             try:
-                script = prompt_session.prompt()
-                glowie.send_script(script)
+                cmd = prompt_session.prompt()
+                glowie.send_command(cmd)
             except KeyboardInterrupt:
                 break
+
 
 if __name__ == "__main__":
     main()

@@ -14,10 +14,7 @@
 #include "uuid.h"
 #include "gatt.h"
 
-
-#define TAG "comms_gatt"
-
-#define COMMS_SCRIPT_IN_BUFFER_SIZE CONFIG_COMMS_SCRIPT_IN_BUFFER_SIZE
+#define COMMS_COMMAND_BUFFER_SIZE   CONFIG_COMMS_COMMAND_BUFFER_SIZE
 
 static_assert(strlen(CONFIG_DEVICE_NAME) <= MYNEWT_VAL_BLE_SVC_GAP_DEVICE_NAME_MAX_LENGTH,
               "Device name too long");
@@ -30,79 +27,18 @@ static glw_comms_callbacks_t callbacks;
 
 // ---- Control service ----
 
-static uint16_t control_enable_handle;
-static int on_enable_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg);
-
-static uint16_t control_brightness_handle;
-static int on_brightness_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg);
-
-static uint16_t control_rgb_handle;
-static int on_rgb_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg);
+static uint16_t control_command_handle;
+static int on_command(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg);
 
 static const struct ble_gatt_svc_def control_srvc_def = {
     .type = BLE_GATT_SVC_TYPE_PRIMARY,
     .uuid = UUID_SERVICE_CONTROL,
     .characteristics = (struct ble_gatt_chr_def[]) {
         {
-            .uuid = UUID_CHAR_ENABLE,
-            .access_cb = on_enable_write,
+            .uuid = UUID_CHAR_COMMAND,
+            .access_cb = on_command,
             .flags = BLE_GATT_CHR_F_WRITE,
-            .val_handle = &control_enable_handle,
-            .cpfd = (struct ble_gatt_cpfd[]) {
-                {
-                    .format = BLE_GATT_CHR_FORMAT_BOOLEAN,
-                    .unit = BLE_GATT_CHR_UNIT_UNITLESS,
-                    .name_space = BLE_GATT_CHR_NAMESPACE_BT_SIG,
-                },
-                {0}
-            },
-        },
-        {
-            .uuid = UUID_CHAR_BRIGHTNESS,
-            .access_cb = on_brightness_write,
-            .flags = BLE_GATT_CHR_F_WRITE,
-            .val_handle = &control_brightness_handle,
-            .cpfd = (struct ble_gatt_cpfd[]) {
-                {
-                    .format = BLE_GATT_CHR_FORMAT_UINT8,
-                    .unit = BLE_GATT_CHR_UNIT_UNITLESS,
-                    .name_space = BLE_GATT_CHR_NAMESPACE_BT_SIG,
-                },
-                {0}
-            }
-        },
-        {
-            .uuid = UUID_CHAR_RGB,
-            .access_cb = on_rgb_write,
-            .flags = BLE_GATT_CHR_F_WRITE,
-            .val_handle = &control_rgb_handle,
-            .cpfd = (struct ble_gatt_cpfd[]) {
-                {
-                    .format = BLE_GATT_CHR_FORMAT_UINT24,
-                    .unit = BLE_GATT_CHR_UNIT_UNITLESS,
-                    .name_space = BLE_GATT_CHR_NAMESPACE_BT_SIG,
-                },
-                {0}
-            },
-        },
-        {0}
-    }
-};
-
-// ---- Script service ----
-
-static uint16_t script_in_handle;
-static int on_script_in(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg);
-
-static const struct ble_gatt_svc_def script_srvc_def = {
-    .type = BLE_GATT_SVC_TYPE_PRIMARY,
-    .uuid = UUID_SERVICE_SCRIPT,
-    .characteristics = (struct ble_gatt_chr_def[]) {
-        {
-            .uuid = UUID_CHAR_SCRIPT_IN,
-            .access_cb = on_script_in,
-            .flags = BLE_GATT_CHR_F_WRITE,
-            .val_handle = &script_in_handle,
+            .val_handle = &control_command_handle,
         },
         {0}
     }
@@ -112,7 +48,6 @@ static const struct ble_gatt_svc_def script_srvc_def = {
 
 static const struct ble_gatt_svc_def service_definitions[] = {
     control_srvc_def,
-    script_srvc_def,
     {0}
 };
 
@@ -122,54 +57,11 @@ static const struct ble_gatt_svc_def service_definitions[] = {
 
 // ==== Control service
 
-static int on_enable_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg){
+static int on_command(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg) {
     assert(ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR);
-    assert(attr_handle == control_enable_handle);
-    if(ctxt->om->om_len != 1) return BLE_ATT_ERR_INVALID_ATTR_VALUE_LEN;
+    assert(attr_handle == control_command_handle);
 
-    uint8_t val = ctxt->om->om_data[0];
-    if (val > 1) return 0xFF;  // value out of range (accept only 0 or 1)
-
-    LOGD("Received write to onoff characteristic. Value: %d", val);
-    callbacks.set_enable_cb(val);
-
-    return 0;
-}
-
-static int on_brightness_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg){
-    assert(ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR);
-    assert(attr_handle == control_brightness_handle);
-    if(ctxt->om->om_len != 1) return BLE_ATT_ERR_INVALID_ATTR_VALUE_LEN;
-
-    uint8_t val = ctxt->om->om_data[0];
-    LOGD("Received write to brightness characteristic. Value: %d", val);
-    callbacks.set_brightness_cb(val);
-
-    return 0;
-}
-
-static int on_rgb_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg){
-    assert(ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR);
-    assert(attr_handle == control_rgb_handle);
-    if(ctxt->om->om_len != 3) return BLE_ATT_ERR_INVALID_ATTR_VALUE_LEN;
-
-    int r = ctxt->om->om_data[0];
-    int g = ctxt->om->om_data[1];
-    int b = ctxt->om->om_data[2];
-
-    LOGD("Received write to rgb characteristic. Value: %d, %d, %d", r, g, b);
-    callbacks.set_color_rgb_cb(r, g, b);
-
-    return 0;
-}
-
-// ==== Script service
-
-static int on_script_in(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg) {
-    assert(ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR);
-    assert(attr_handle == script_in_handle);
-
-    char input_buffer[COMMS_SCRIPT_IN_BUFFER_SIZE];
+    char input_buffer[COMMS_COMMAND_BUFFER_SIZE];
     uint16_t written_len;
 
     if(ble_hs_mbuf_to_flat(ctxt->om, input_buffer, sizeof(input_buffer) - 1, &written_len) != 0) {
@@ -177,10 +69,11 @@ static int on_script_in(uint16_t conn_handle, uint16_t attr_handle, struct ble_g
     }
     input_buffer[written_len] = 0;
 
-    LOGD("Received %u bytes of script input: %s", written_len, input_buffer);
+    LOGD("Received %u bytes of command input: %s", written_len, input_buffer);
 
-    if(callbacks.script_in_cb(input_buffer)) return 0;
-    else return 0xFE;
+    callbacks.command_cb(input_buffer);
+
+    return 0;
 }
 
 // ===============================================
