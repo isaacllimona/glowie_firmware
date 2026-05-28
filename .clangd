@@ -1,0 +1,7 @@
+CompileFlags:
+  Remove: [-f*, -m*]
+---
+If:
+  PathMatch: .*/native/.*
+CompileFlags:
+  CompilationDatabase: build_native

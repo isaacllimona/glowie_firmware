@@ -10,7 +10,6 @@ managed_components
 # local environment
 dev_shell.sh
 .vscode
-.clangd
 .zed
 local/
 
