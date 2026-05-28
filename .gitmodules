@@ -1,6 +1,6 @@
 [submodule "components/glw_script/lua"]
 	path = components/glw_script/lua
 	url = https://github.com/lua/lua.git
-[submodule "test/Unity"]
+[submodule "test/unity/Unity"]
 	path = test/unity/Unity
 	url = https://github.com/ThrowTheSwitch/Unity.git
