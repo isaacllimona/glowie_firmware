@@ -8,4 +8,4 @@ glw_add_module(${TARGET}
     DEPENDS glw_log
 )
 
-link_idf_components(${TARGET} PRIVATE esp_driver_gpio)
+link_idf_components(${TARGET} PRIVATE esp_driver_gpio esp_adc)

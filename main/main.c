@@ -7,6 +7,7 @@
 #include "glw_led.h"
 #include "glw_script.h"
 #include "glw_sys.h"
+#include "glw_os/time.h"
 
 #include "log.h"
 
@@ -47,4 +48,10 @@ void app_main(void) {
 
     const glw_comms_init_t comms_init_struct = {.callbacks = {.command_cb = glw_command_run}};
     glw_comms_init(comms_init_struct);
+
+    while (1) {
+        int vbatt = glw_sys_batt_voltage_read_milivolts();
+        LOGI("battery voltage: %d", vbatt);
+        os_delay(5000);
+    }
 }

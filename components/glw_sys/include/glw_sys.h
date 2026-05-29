@@ -18,3 +18,8 @@ void glw_sys_shutdown(void);
  * Power on/off the LEDs
  */
 void glw_sys_led_en(bool enabled);
+
+/*
+ * Read battery voltage
+ */
+int glw_sys_batt_voltage_read_milivolts(void);
