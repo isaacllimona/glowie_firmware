@@ -3,6 +3,7 @@
 #include "portmacro.h"
 
 #include "log.h"
+#include "config.h"
 #include "glw_script.h"
 #include "glw_script_priv.h"
 
@@ -37,5 +38,5 @@ static void script_task(void * param) {
 }
 
 void glw_script_start(void) {
-    xTaskCreate(script_task, "script_runner", 5000, NULL, 2, &interpreter_task);
+    xTaskCreate(script_task, "script_runner", CONFIG_SCRIPT_TASK_STACK_SIZE, NULL, 2, &interpreter_task);
 }
