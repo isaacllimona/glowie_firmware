@@ -7,7 +7,7 @@ typedef struct {
     void (*led_en)(bool enabled);
     void (*brightness_set)(uint8_t value);
     void (*shutdown)(void);
-    void (*script_run)(char *script);
+    void (*script_run)(const char *script);
 } glw_command_callbacks_t;
 
 typedef void (*error_cb_t)(char *msg);

@@ -12,9 +12,11 @@
 
 #include "log.h"
 
+static const char *startup_script = "v=0 while v<20 do v=v+2 led.setColorHSV(95,170,v) sys.sleep(30) end while v>0 do v=v-1 led.setColorHSV(95,170,v) sys.sleep(30) end";
+
 static void command_error_cb(char *msg) { LOGE("COMMAND ERROR: %s", msg); }
 
-static void run_script(char *script) {
+static void run_script(const char *script) {
     if(!glw_script_run_string(script)){
         LOGE("Could not run script. Another script is already queued.");
     }
@@ -63,6 +65,8 @@ void app_main(void) {
     lua_led_lib_cfg(&led_lib_cfg);
 
     glw_script_start();
+
+    run_script(startup_script);
 
     const glw_command_setup_t command_setup = {.cmd_callbacks = {.led_en = glw_sys_led_en,
                                                                  .brightness_set = glw_led_set_brightness,

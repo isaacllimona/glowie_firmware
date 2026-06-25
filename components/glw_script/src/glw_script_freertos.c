@@ -26,7 +26,7 @@ bool wait_for_input(char *buffer, glw_script_time_t timeout_ms) {
     return true;
 }
 
-bool glw_script_run_string(char * script_str) {
+bool glw_script_run_string(const char * script_str) {
     if(atomic_flag_test_and_set(&is_buffer_taken)) return false;
     strcpy(script_buffer, script_str);
     xTaskNotifyGive(interpreter_task);

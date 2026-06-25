@@ -17,7 +17,7 @@ void glw_script_start(void);
 void glw_script_stop(void);
 
 /** Queue a script for running */
-bool glw_script_run_string(char * script_str);
+bool glw_script_run_string(const char * script_str);
 
 
 // ==== LIBRARIES ====

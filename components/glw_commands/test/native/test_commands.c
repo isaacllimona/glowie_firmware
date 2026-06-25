@@ -11,7 +11,7 @@ DEFINE_FFF_GLOBALS;
 FAKE_VOID_FUNC(led_en, bool);
 FAKE_VOID_FUNC(brightness_set, uint8_t);
 FAKE_VOID_FUNC(shutdown);
-FAKE_VOID_FUNC(script_run, char *);
+FAKE_VOID_FUNC(script_run, const char *);
 
 FAKE_VOID_FUNC(error_cb, char *);
 
