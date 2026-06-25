@@ -1,5 +1,6 @@
 #include <stdbool.h>
 
+#include "glw_os/task.h"
 #include "nvs_flash.h"
 
 #include "glw_commands.h"
@@ -19,8 +20,23 @@ static void run_script(char *script) {
     }
 }
 
+static void force_shutdown_after_delay(void *args) {
+    os_delay(3000);
+    LOGE("Clean up is taking too long. Shutting down...");
+    glw_sys_shutdown();
+    os_delay(5000);
+}
+
 static void shutdown(void) {
-    glw_comms_disconnect();
+    // glw_comms_stop() may block forever. Force shutdown after some time
+    os_task_create(force_shutdown_after_delay, "force_shutdown_timer", 1000, NULL, 24);
+
+    LOGI("Shutdown requested. Cleaning up...");
+
+    glw_comms_stop();
+
+    LOGI("BLE stopped. Shutting down...");
+
     glw_sys_shutdown();
 }
 

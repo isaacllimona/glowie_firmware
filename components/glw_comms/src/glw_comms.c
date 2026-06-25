@@ -43,6 +43,13 @@ void glw_comms_init(glw_comms_init_t init) {
     nimble_port_freertos_init(host_task);
 }
 
-void glw_comms_disconnect(void) {
+void glw_comms_stop(void) {
     gap_disconnect();
+
+    int rc = nimble_port_stop();
+    if (rc == 0) {
+        nimble_port_deinit();
+    } else {
+        LOGE("Nimble port stop failed, rc = %d", rc);
+    }
 }
