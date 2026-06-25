@@ -19,6 +19,11 @@ static void run_script(char *script) {
     }
 }
 
+static void shutdown(void) {
+    glw_comms_disconnect();
+    glw_sys_shutdown();
+}
+
 void app_main(void) {
     glw_sys_init();
 
@@ -41,7 +46,7 @@ void app_main(void) {
 
     const glw_command_setup_t command_setup = {.cmd_callbacks = {.led_en = glw_sys_led_en,
                                                                  .brightness_set = glw_led_set_brightness,
-                                                                 .shutdown = glw_sys_shutdown,
+                                                                 .shutdown = shutdown,
                                                                  .script_run = run_script},
                                                .error_cb = command_error_cb};
     glw_command_setup(&command_setup);

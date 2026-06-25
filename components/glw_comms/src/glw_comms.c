@@ -42,3 +42,7 @@ void glw_comms_init(glw_comms_init_t init) {
 
     nimble_port_freertos_init(host_task);
 }
+
+void glw_comms_disconnect(void) {
+    gap_disconnect();
+}

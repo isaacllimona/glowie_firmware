@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #include "log.h"
 
 #include "nimble/ble.h"
@@ -106,11 +108,19 @@ static int log_connection_details(uint16_t conn_handle) {
     return 0;
 }
 
+static struct {
+    bool connected;
+    uint16_t handle;
+} connection = {0};
+
 static int on_gap_event(struct ble_gap_event *event, void *arg) {
     switch(event->type) {
         case BLE_GAP_EVENT_CONNECT:
             LOGI("connection %s", event->connect.status == 0 ? "established" : "failed");
             if(event->connect.status == 0) {
+                connection.connected = true;
+                connection.handle = event->connect.conn_handle;
+
                 int rc = log_connection_details(event->connect.conn_handle);
                 return rc;
             }
@@ -121,6 +131,7 @@ static int on_gap_event(struct ble_gap_event *event, void *arg) {
 
         case BLE_GAP_EVENT_DISCONNECT:
             LOGI("disconnected from peer; reason=%d", event->disconnect.reason);
+            connection.connected = false;
             advertisement_start();
             return 0;
 
@@ -144,4 +155,10 @@ static int on_gap_event(struct ble_gap_event *event, void *arg) {
 void gap_start(void){
     advertisement_setup();
     advertisement_start();
+}
+
+void gap_disconnect(void) {
+    if(connection.connected) {
+        ble_gap_terminate(connection.handle, BLE_ERR_RD_CONN_TERM_PWROFF);
+    }
 }

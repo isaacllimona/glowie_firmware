@@ -10,3 +10,5 @@ typedef struct comms_init_t {
 } glw_comms_init_t;
 
 void glw_comms_init(glw_comms_init_t init);
+
+void glw_comms_disconnect(void);
