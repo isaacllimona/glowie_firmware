@@ -33,6 +33,10 @@ static void shutdown(void) {
 
     LOGI("Shutdown requested. Cleaning up...");
 
+    // Turn off the LEDs. Just required if the hardware does not disconnect the LEDs on shutdown
+    glw_script_stop();
+    glw_led_set_color(0,0,0);
+
     glw_comms_stop();
 
     LOGI("BLE stopped. Shutting down...");

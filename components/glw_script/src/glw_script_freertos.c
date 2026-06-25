@@ -40,3 +40,7 @@ static void script_task(void * param) {
 void glw_script_start(void) {
     xTaskCreate(script_task, "script_runner", CONFIG_SCRIPT_TASK_STACK_SIZE, NULL, 2, &interpreter_task);
 }
+
+void glw_script_stop() {
+    vTaskDelete(interpreter_task);
+}

@@ -13,6 +13,9 @@ typedef struct {
 /** Start the interpreter and wait for input */
 void glw_script_start(void);
 
+/** Stop the interpreter */
+void glw_script_stop(void);
+
 /** Queue a script for running */
 bool glw_script_run_string(char * script_str);
 
