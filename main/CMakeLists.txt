@@ -4,6 +4,7 @@ set(TARGET main)
 
 add_library(${TARGET} STATIC
     main.c
+    sync_clock.c
 )
 
 target_link_libraries(${TARGET} PRIVATE
