@@ -11,6 +11,7 @@
 #include "glw_os/time.h"
 
 #include "log.h"
+#include "sync_clock.h"
 
 static const char *startup_script = "v=0 while v<20 do v=v+2 led.setColorHSV(95,170,v) sys.sleep(30) end while v>0 do v=v-1 led.setColorHSV(95,170,v) sys.sleep(30) end";
 
@@ -56,8 +57,6 @@ static void set_led_enabled(bool enabled) {
     glw_led_set_enabled(enabled);
 }
 
-static void dummy_time_set(unsigned long time) { LOGI("Set time: %u", time); }
-
 void app_main(void) {
     glw_sys_init();
 
@@ -84,7 +83,7 @@ void app_main(void) {
                                                                  .brightness_set = glw_led_set_brightness,
                                                                  .shutdown = shutdown,
                                                                  .script_run = run_script,
-                                                                 .time_set = dummy_time_set},
+                                                                 .time_set = sync_clock_set},
                                                .error_cb = command_error_cb};
     glw_command_setup(&command_setup);
 
