@@ -46,6 +46,16 @@ static void shutdown(void) {
     glw_sys_shutdown();
 }
 
+static void set_led_enabled(bool enabled) {
+    // Power on/off the LEDs with the LED enable GPIO
+    glw_sys_led_en(enabled);
+
+    // Refresh the LEDs to the previous state after power on
+    // Also light off the LEDs even if the hardware does not support GPIO LED disabling
+    os_delay(10);  // Wait for the LEDs to power on. TODO: tune delay
+    glw_led_set_enabled(enabled);
+}
+
 void app_main(void) {
     glw_sys_init();
 
@@ -68,7 +78,7 @@ void app_main(void) {
 
     run_script(startup_script);
 
-    const glw_command_setup_t command_setup = {.cmd_callbacks = {.led_en = glw_sys_led_en,
+    const glw_command_setup_t command_setup = {.cmd_callbacks = {.led_en = set_led_enabled,
                                                                  .brightness_set = glw_led_set_brightness,
                                                                  .shutdown = shutdown,
                                                                  .script_run = run_script},
