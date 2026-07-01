@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "parsing_utils.h"
 
@@ -32,11 +33,11 @@ static void cmd_brightness_set(char *args) {
         return;
     }
 
-    long brightness;
-    if (argparse_parse_long(args, &brightness, &args)) {
+    unsigned long brightness;
+    if (argparse_parse_ulong(args, &brightness, &args)) {
         if (*args != 0)
             send_error("Expected a single argument to brightness_set command");
-        else if (brightness > 255 || brightness < 0)
+        else if (brightness > 255)
             send_error("Brightness must be in the range 0-255");
         else {
             cmd_callbacks.brightness_set(brightness);
@@ -51,6 +52,23 @@ static void cmd_shutdown(char *args) {
         return;
     }
     cmd_callbacks.shutdown();
+}
+
+static void cmd_time_set(char *args) {
+    if (args[0] == 0) {
+        send_error("Expected an argument after time_set command");
+        return;
+    }
+
+    unsigned long time_ms;
+    if (argparse_parse_ulong(args, &time_ms, &args)) {
+        if (*args != 0)
+            send_error("Expected a single argument to time_set command");
+        else {
+            cmd_callbacks.time_set((unsigned long)time_ms);
+        }
+    } else
+        send_error("Bad argument to time_set command. Expected an unsigned integer");
 }
 
 static void cmd_run(char *args) {
@@ -68,6 +86,7 @@ void glw_command_setup(const glw_command_setup_t *setup) {
     assert(setup->cmd_callbacks.brightness_set != NULL);
     assert(setup->cmd_callbacks.script_run != NULL);
     assert(setup->cmd_callbacks.shutdown != NULL);
+    assert(setup->cmd_callbacks.time_set != NULL);
     cmd_callbacks = setup->cmd_callbacks;
 
     error_cb = setup->error_cb;
@@ -82,6 +101,8 @@ void glw_command_run(char *input) {
         cmd_brightness_set(args);
     else if (argparse_check_cmd(input, "shutdown", &args))
         cmd_shutdown(args);
+    else if (argparse_check_cmd(input, "time_set", &args))
+        cmd_time_set(args);
     else if (argparse_check_cmd(input, "run", &args))
         cmd_run(args);
     else {
