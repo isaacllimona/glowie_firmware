@@ -8,7 +8,7 @@
 #include "glw_script_priv.h"
 
 
-static TaskHandle_t interpreter_task;
+static TaskHandle_t script_task_handle;
 static atomic_flag is_buffer_taken = ATOMIC_FLAG_INIT;
 static char script_buffer[INPUT_BUFFER_SIZE];
 
@@ -29,7 +29,7 @@ bool wait_for_input(char *buffer, glw_script_time_t timeout_ms) {
 bool glw_script_run_string(const char * script_str) {
     if(atomic_flag_test_and_set(&is_buffer_taken)) return false;
     strcpy(script_buffer, script_str);
-    xTaskNotifyGive(interpreter_task);
+    xTaskNotifyGive(script_task_handle);
     return true;
 }
 
@@ -38,9 +38,9 @@ static void script_task(void * param) {
 }
 
 void glw_script_start(void) {
-    xTaskCreate(script_task, "script_runner", CONFIG_SCRIPT_TASK_STACK_SIZE, NULL, 2, &interpreter_task);
+    xTaskCreate(script_task, "script_runner", CONFIG_SCRIPT_TASK_STACK_SIZE, NULL, 2, &script_task_handle);
 }
 
 void glw_script_stop() {
-    vTaskDelete(interpreter_task);
+    vTaskDelete(script_task_handle);
 }

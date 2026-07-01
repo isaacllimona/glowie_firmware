@@ -69,15 +69,15 @@ void app_main(void) {
 
     glw_led_init();
 
-    const lua_led_lib_cfg_t led_lib_cfg = {
-        .set_color_rgb = glw_led_set_color,
-        .set_color_hsv = glw_led_set_color_hsv,
-    };
-    lua_led_lib_cfg(&led_lib_cfg);
+    // const lua_led_lib_cfg_t led_lib_cfg = {
+    //     .set_color_rgb = glw_led_set_color,
+    //     .set_color_hsv = glw_led_set_color_hsv,
+    // };
+    // lua_led_lib_cfg(&led_lib_cfg);
 
-    glw_script_start();
+    // glw_script_start();
 
-    run_script(startup_script);
+    // run_script(startup_script);
 
     const glw_command_setup_t command_setup = {.cmd_callbacks = {.led_en = set_led_enabled,
                                                                  .brightness_set = glw_led_set_brightness,

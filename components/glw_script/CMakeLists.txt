@@ -37,17 +37,12 @@ set(lua_srcs
     "lua/lzio.c"
 )
 
-set(lua_libs
-    "src/lua_libs/lua_led_lib.c"
-    "src/lua_libs/lua_sys_lib.c"
-)
-
 glw_add_module(${TARGET}
     SOURCES
         ${lua_srcs}
-        ${lua_libs}
         src/glw_script.c
         src/glw_script_freertos.c
+        src/builtin_lua_funcs.c
     INCLUDE_PRIVATE lua src
     DEPENDS glw_log
 )
