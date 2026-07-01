@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <stdbool.h>
@@ -27,10 +28,14 @@ static bool argparse_check_cmd(char *input, char *command, char **args) {
     return true;
 }
 
-static bool argparse_parse_long(char *input, long *value, char **next) {
+static bool argparse_parse_ulong(char *input, unsigned long *value, char **next) {
+    // strtoul does not set an error if the input is negative. Check manually
+    if (*input == '-')
+        return false;
+
     char *end;
     errno = 0;
-    *value = strtol(input, &end, 10);
+    *value = strtoul(input, &end, 10);
 
     if (errno == 0 && end != input && (*end == 0 || argparse__is_delimiter(*end))) {
         // Valid integer. Find start of next argument

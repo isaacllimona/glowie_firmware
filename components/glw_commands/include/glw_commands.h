@@ -8,6 +8,7 @@ typedef struct {
     void (*brightness_set)(uint8_t value);
     void (*shutdown)(void);
     void (*script_run)(const char *script);
+    void (*time_set)(unsigned long ms);
 } glw_command_callbacks_t;
 
 typedef void (*error_cb_t)(char *msg);

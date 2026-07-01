@@ -8,6 +8,7 @@ FAKE_VOID_FUNC(led_en, bool);
 FAKE_VOID_FUNC(brightness_set, uint8_t);
 FAKE_VOID_FUNC(shutdown);
 FAKE_VOID_FUNC(script_run, const char *);
+FAKE_VOID_FUNC(time_set, unsigned long);
 
 FAKE_VOID_FUNC(error_cb, char *);
 
@@ -25,6 +26,7 @@ const glw_command_setup_t command_setup = {
         .brightness_set = brightness_set,
         .shutdown = shutdown,
         .script_run = script_run,
+        .time_set = time_set
     },
     .error_cb = error_cb
 };
@@ -39,6 +41,7 @@ void setUp() {
     RESET_FAKE(brightness_set);
     RESET_FAKE(shutdown);
     RESET_FAKE(script_run);
+    RESET_FAKE(time_set);
 
     RESET_FAKE(error_cb);
 
@@ -114,6 +117,39 @@ TEST_CASE(shutdown) {
     ASSERT_ONLY_CALL(shutdown);
 }
 
+// --- time_set
+
+TEST_CASE(time_set_zero) {
+    setup_and_run_cmd("time_set 0");
+    assert_no_error();
+
+    ASSERT_ONLY_CALL(time_set);
+    TEST_ASSERT_EQUAL(0, time_set_fake.arg0_val);
+}
+
+TEST_CASE(time_set_large_value) {
+    setup_and_run_cmd("time_set 4294967295");
+    assert_no_error();
+
+    ASSERT_ONLY_CALL(time_set);
+    TEST_ASSERT_EQUAL(4294967295, time_set_fake.arg0_val);
+}
+
+TEST_CASE(time_set_no_args) {
+    setup_and_run_cmd("time_set");
+    assert_error();
+}
+
+TEST_CASE(time_set_negative) {
+    setup_and_run_cmd("time_set -1");
+    assert_error();
+}
+
+TEST_CASE(time_set_extra_args) {
+    setup_and_run_cmd("time_set 100 extra");
+    assert_error();
+}
+
 // --- script_run (via "run" command)
 
 TEST_CASE(run_script) {
@@ -158,6 +194,12 @@ int main(void) {
     RUN_TEST(test_brightness_set_negative);
 
     RUN_TEST(test_shutdown);
+
+    RUN_TEST(test_time_set_zero);
+    RUN_TEST(test_time_set_large_value);
+    RUN_TEST(test_time_set_no_args);
+    RUN_TEST(test_time_set_negative);
+    RUN_TEST(test_time_set_extra_args);
 
     RUN_TEST(test_run_script);
     RUN_TEST(test_run_script_with_spaces);

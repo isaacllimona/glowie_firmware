@@ -56,6 +56,8 @@ static void set_led_enabled(bool enabled) {
     glw_led_set_enabled(enabled);
 }
 
+static void dummy_time_set(unsigned long time) { LOGI("Set time: %u", time); }
+
 void app_main(void) {
     glw_sys_init();
 
@@ -81,7 +83,8 @@ void app_main(void) {
     const glw_command_setup_t command_setup = {.cmd_callbacks = {.led_en = set_led_enabled,
                                                                  .brightness_set = glw_led_set_brightness,
                                                                  .shutdown = shutdown,
-                                                                 .script_run = run_script},
+                                                                 .script_run = run_script,
+                                                                 .time_set = dummy_time_set},
                                                .error_cb = command_error_cb};
     glw_command_setup(&command_setup);
 

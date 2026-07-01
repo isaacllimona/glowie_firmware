@@ -10,6 +10,7 @@ include(CTest)
 if(NOT BUILD_NATIVE)
     glw_idf_init()
 else()
+    add_compile_options(-Wall)
     set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 endif()
 
