@@ -1,22 +1,19 @@
 cmake_minimum_required(VERSION 3.22)
 
-if(NOT BUILD_NATIVE)
-    include($ENV{IDF_PATH}/tools/cmakev2/idf.cmake)
-endif()
+include(tools/buildsystem/cmake/esp_idf_wrapper.cmake)
+include(tools/buildsystem/cmake/modules.cmake)
 
 project(glowie C CXX ASM)
-
-include(tools/buildsystem/cmake/idf_utils.cmake)
-include(tools/buildsystem/cmake/modules.cmake)
 
 include(CTest)
 
 if(NOT BUILD_NATIVE)
-    idf_project_default()
+    glw_idf_init()
 else()
     set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 endif()
 
+add_subdirectory(main)
 add_subdirectory(components/bmi160)
 add_subdirectory(components/glw_os)
 add_subdirectory(components/glw_log)
@@ -28,6 +25,10 @@ add_subdirectory(components/glw_sys)
 add_subdirectory(components/glw_commands)
 
 if(BUILD_TESTING)
-    enable_testing()
     add_subdirectory(test)
+endif()
+
+if(NOT BUILD_NATIVE)
+    glw_idf_add_main_app(main)
+    glw_idf_finish()
 endif()

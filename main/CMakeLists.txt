@@ -1,8 +1,6 @@
-if(DEFINED COMPONENT_TARGET)
-    set(TARGET ${COMPONENT_TARGET})
-else()
-    set(TARGET main)
-endif()
+glw_exclude_from_native_build()
+
+set(TARGET main)
 
 add_library(${TARGET} STATIC
     main.c
