@@ -2,5 +2,8 @@
 	path = components/glw_script/lua
 	url = https://github.com/lua/lua.git
 [submodule "test/unity/Unity"]
-	path = test/unity/Unity
+	path = test/third_party/unity/Unity
 	url = https://github.com/ThrowTheSwitch/Unity.git
+[submodule "components/glw_imu/third_party/lsm6dsv32x"]
+	path = components/glw_imu/third_party/lsm6dsv32x
+	url = https://github.com/STMicroelectronics/lsm6dsv32x-pid.git

@@ -3,9 +3,8 @@ add_executable(commands_test_app
 )
 
 target_link_libraries(commands_test_app
-    Unity
-    fff
-    glw_commands
+  native_test_common
+  glw_commands
 )
 
 add_test(NAME commands_test COMMAND commands_test_app)
