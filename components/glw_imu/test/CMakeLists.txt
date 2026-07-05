@@ -1,0 +1,5 @@
+if(BUILD_NATIVE)
+    add_subdirectory(native)
+else()
+    add_subdirectory(integration)
+endif()

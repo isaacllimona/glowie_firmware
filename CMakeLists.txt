@@ -23,6 +23,7 @@ add_subdirectory(components/glw_led)
 add_subdirectory(components/glw_script)
 add_subdirectory(components/glw_sys)
 add_subdirectory(components/glw_commands)
+add_subdirectory(components/glw_imu)
 
 if(BUILD_TESTING)
     add_subdirectory(test)
