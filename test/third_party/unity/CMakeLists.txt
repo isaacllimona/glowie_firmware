@@ -1,7 +1,7 @@
-add_library(Unity STATIC
+add_library(unity STATIC
     Unity/src/unity.c
 )
 
-target_include_directories(Unity PUBLIC
+target_include_directories(unity PUBLIC
     Unity/src
 )
