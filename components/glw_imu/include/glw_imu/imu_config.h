@@ -7,16 +7,18 @@
  */
 typedef enum {
     GLW_IMU_ODR_OFF = 0,
-    GLW_IMU_ODR_12Hz5,
-    GLW_IMU_ODR_25Hz,
-    GLW_IMU_ODR_50Hz,
-    GLW_IMU_ODR_100Hz,
-    GLW_IMU_ODR_200Hz,
-    GLW_IMU_ODR_400Hz,
-    GLW_IMU_ODR_800Hz,
-    GLW_IMU_ODR_1600Hz,
-    GLW_IMU_ODR_3200Hz,
-    GLW_IMU_ODR_6400Hz,
+    GLW_IMU_ODR_1Hz875,
+    GLW_IMU_ODR_7Hz5,
+    GLW_IMU_ODR_15Hz,
+    GLW_IMU_ODR_30Hz,
+    GLW_IMU_ODR_60Hz,
+    GLW_IMU_ODR_120Hz,
+    GLW_IMU_ODR_240Hz,
+    GLW_IMU_ODR_480Hz,
+    GLW_IMU_ODR_960Hz,
+    GLW_IMU_ODR_1920Hz,
+    GLW_IMU_ODR_3840Hz,
+    GLW_IMU_ODR_7680Hz,
 } glw_imu_odr_t;
 
 /**

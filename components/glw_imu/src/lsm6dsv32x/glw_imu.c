@@ -26,26 +26,30 @@ static lsm6dsv32x_data_rate_t map_odr(glw_imu_odr_t odr) {
     switch (odr) {
     case GLW_IMU_ODR_OFF:
         return LSM6DSV32X_ODR_OFF;
-    case GLW_IMU_ODR_12Hz5:
-        return LSM6DSV32X_ODR_HA02_AT_12Hz5;
-    case GLW_IMU_ODR_25Hz:
-        return LSM6DSV32X_ODR_HA02_AT_25Hz;
-    case GLW_IMU_ODR_50Hz:
-        return LSM6DSV32X_ODR_HA02_AT_50Hz;
-    case GLW_IMU_ODR_100Hz:
-        return LSM6DSV32X_ODR_HA02_AT_100Hz;
-    case GLW_IMU_ODR_200Hz:
-        return LSM6DSV32X_ODR_HA02_AT_200Hz;
-    case GLW_IMU_ODR_400Hz:
-        return LSM6DSV32X_ODR_HA02_AT_400Hz;
-    case GLW_IMU_ODR_800Hz:
-        return LSM6DSV32X_ODR_HA02_AT_800Hz;
-    case GLW_IMU_ODR_1600Hz:
-        return LSM6DSV32X_ODR_HA02_AT_1600Hz;
-    case GLW_IMU_ODR_3200Hz:
-        return LSM6DSV32X_ODR_HA02_AT_3200Hz;
-    case GLW_IMU_ODR_6400Hz:
-        return LSM6DSV32X_ODR_HA02_AT_6400Hz;
+    case GLW_IMU_ODR_1Hz875:
+        return LSM6DSV32X_ODR_AT_1Hz875;
+    case GLW_IMU_ODR_7Hz5:
+        return LSM6DSV32X_ODR_AT_7Hz5;
+    case GLW_IMU_ODR_15Hz:
+        return LSM6DSV32X_ODR_AT_15Hz;
+    case GLW_IMU_ODR_30Hz:
+        return LSM6DSV32X_ODR_AT_30Hz;
+    case GLW_IMU_ODR_60Hz:
+        return LSM6DSV32X_ODR_AT_60Hz;
+    case GLW_IMU_ODR_120Hz:
+        return LSM6DSV32X_ODR_AT_120Hz;
+    case GLW_IMU_ODR_240Hz:
+        return LSM6DSV32X_ODR_AT_240Hz;
+    case GLW_IMU_ODR_480Hz:
+        return LSM6DSV32X_ODR_AT_480Hz;
+    case GLW_IMU_ODR_960Hz:
+        return LSM6DSV32X_ODR_AT_960Hz;
+    case GLW_IMU_ODR_1920Hz:
+        return LSM6DSV32X_ODR_AT_1920Hz;
+    case GLW_IMU_ODR_3840Hz:
+        return LSM6DSV32X_ODR_AT_3840Hz;
+    case GLW_IMU_ODR_7680Hz:
+        return LSM6DSV32X_ODR_AT_7680Hz;
     default:
         return LSM6DSV32X_ODR_OFF;
     }

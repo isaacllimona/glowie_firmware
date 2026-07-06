@@ -17,8 +17,8 @@ static char msg_buffer[100];
 static void test_glw_imu_init(void) { ASSERT_OK(glw_imu_init()); }
 
 static void test_glw_imu_fifo_acc_and_gyr(void) {
-    glw_imu_accel_config_t acc_config = {.full_scale = GLW_IMU_ACCEL_FS_32G, .odr = GLW_IMU_ODR_3200Hz};
-    glw_imu_gyro_config_t gyro_config = {.full_scale = GLW_IMU_GYRO_FS_4000DPS, .odr = GLW_IMU_ODR_3200Hz};
+    glw_imu_accel_config_t acc_config = {.full_scale = GLW_IMU_ACCEL_FS_32G, .odr = GLW_IMU_ODR_3840Hz};
+    glw_imu_gyro_config_t gyro_config = {.full_scale = GLW_IMU_GYRO_FS_4000DPS, .odr = GLW_IMU_ODR_3840Hz};
     ASSERT_OK(glw_imu_configure_accel(&acc_config));
     ASSERT_OK(glw_imu_configure_gyro(&gyro_config));
 
