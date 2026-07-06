@@ -1,10 +1,12 @@
-add_executable(glw_imu_native_test_app
-    test_lsm6dsv32x.c
-)
+add_subdirectory(lsm6dsv32x/imu)
+add_subdirectory(lsm6dsv32x/fifo)
 
-target_link_libraries(glw_imu_native_test_app
-  native_test_common
-  glw_imu
+add_library(imu_native_test_common INTERFACE)
+target_include_directories(imu_native_test_common INTERFACE
+    .           # To access the bus mock
+    ../../src   # To access glw_imu privates
 )
-
-add_test(NAME glw_imu_native_tests COMMAND glw_imu_native_test_app)
+target_link_libraries(imu_native_test_common INTERFACE
+    native_test_common
+    glw_imu
+)

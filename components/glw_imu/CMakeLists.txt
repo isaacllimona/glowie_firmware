@@ -2,6 +2,7 @@ set(TARGET glw_imu)
 
 set(SOURCES
     src/lsm6dsv32x/glw_imu.c
+    src/lsm6dsv32x/fifo.c
     third_party/lsm6dsv32x/lsm6dsv32x_reg.c
 )
 
