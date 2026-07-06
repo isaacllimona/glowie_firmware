@@ -4,7 +4,9 @@
 
 include_guard(GLOBAL)
 
-include($ENV{IDF_PATH}/tools/cmakev2/idf.cmake)
+if(NOT BUILD_NATIVE)
+    include($ENV{IDF_PATH}/tools/cmakev2/idf.cmake)
+endif()
 
 # This is a macro as the idf_project_init() macro must be called from the global scope
 macro(glw_idf_init)
