@@ -12,5 +12,5 @@ set(SOURCES
 
 glw_add_module(${TARGET}
     SOURCES ${SOURCES}
-    DEPENDS glw_log glw_os bmi160
+    DEPENDS glw_log glw_os bmi160 glw_imu
 )

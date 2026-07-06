@@ -1,8 +1,10 @@
 #pragma once
 
-/** 
- * Initialize the module 
- * 
+#include "glw_inrt/data_dispatcher.h" // IWYU pragma: export
+
+/**
+ * Initialize the module
+ *
  * Initialises the IMU, state estimation loop, and data dispatcher
  */
 void glw_inrt_init(void);
