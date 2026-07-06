@@ -90,8 +90,10 @@ glw_imu_error_t glw_imu_fifo_fetch(glw_imu_fifo_fetch_result_t *fetch_result) {
     // ---- Read the fifo
     uint16_t read_entries = fifo_level > FIFO_RAW_BUFFER_SIZE ? FIFO_RAW_BUFFER_SIZE : fifo_level;
     uint16_t read_len = read_entries * FIFO_RAW_ENTRY_SIZE;
-    PROPAGATE_ERROR(
-        lsm6dsv32x_read_reg(&dev_ctx, LSM6DSV32X_FIFO_DATA_OUT_TAG, fifo_raw_buffer.data, read_len));
+    if (read_len > 0) {
+        PROPAGATE_ERROR(
+            lsm6dsv32x_read_reg(&dev_ctx, LSM6DSV32X_FIFO_DATA_OUT_TAG, fifo_raw_buffer.data, read_len));
+    }
 
     // ---- Reset fifo buffer
     fifo_raw_buffer.data_it = fifo_raw_buffer.data;

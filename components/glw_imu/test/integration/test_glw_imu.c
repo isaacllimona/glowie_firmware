@@ -48,7 +48,25 @@ static void test_glw_imu_fifo_acc_and_gyr(void) {
                       frame_cnt * 2); // We should get a frame for every 2 entries
 }
 
+static void test_glw_imu_fifo_fetch_empty(void) {
+    glw_imu_accel_config_t acc_config = {.full_scale = GLW_IMU_ACCEL_FS_32G, .odr = GLW_IMU_ODR_1Hz875};
+    glw_imu_gyro_config_t gyro_config = {.full_scale = GLW_IMU_GYRO_FS_4000DPS, .odr = GLW_IMU_ODR_1Hz875};
+    ASSERT_OK(glw_imu_configure_accel(&acc_config));
+    ASSERT_OK(glw_imu_configure_gyro(&gyro_config));
+
+    ASSERT_OK(glw_imu_fifo_init());
+
+    glw_imu_fifo_fetch_result_t fetch_result;
+
+    ASSERT_OK(glw_imu_fifo_fetch(NULL));
+    ASSERT_OK(glw_imu_fifo_fetch(NULL));
+    ASSERT_OK(glw_imu_fifo_fetch(&fetch_result));
+
+    TEST_ASSERT_EQUAL(0, fetch_result.fetched_entries);
+}
+
 void glw_imu_test_run_all() {
     RUN_TEST(test_glw_imu_init);
     RUN_TEST(test_glw_imu_fifo_acc_and_gyr);
+    RUN_TEST(test_glw_imu_fifo_fetch_empty);
 }

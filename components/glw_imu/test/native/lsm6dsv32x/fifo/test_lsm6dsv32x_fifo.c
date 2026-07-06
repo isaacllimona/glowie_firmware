@@ -32,6 +32,8 @@ static uint8_t *fake_fifo_ptr;
 static uint8_t fake_fifo_level; // value returned for FIFO_STATUS1
 
 static glw_imu_error_t bus_read_fake_for_fifo(uint8_t addr, uint8_t *buffer, uint16_t len) {
+    if (len == 0) return GLW_IMU_BUS_ERROR;  // Trying to read 0 bytes results in error
+
     if (addr == 0x1B) {
         // FIFO_STATUS1 + FIFO_STATUS2  (read in one 2-byte transfer)
         if (len >= 1)
