@@ -20,8 +20,8 @@ static bool argparse_check_cmd(char *input, char *command, char **args) {
     if (input[0] != 0 && !argparse__is_delimiter(input[0]))
         return false;
 
-    // find the beginning of the arguments
-    while (argparse__is_delimiter(input[0]))
+    // go to the beginning of the arguments
+    if (input[0] != 0)
         input++;
     *args = input;
 

@@ -168,6 +168,18 @@ TEST_CASE(run_script_with_spaces) {
     TEST_ASSERT_EQUAL_STRING("my long script", script_run_fake.arg0_val);
 }
 
+TEST_CASE(run_script_starting_with_space) {
+    // Ensure a space at the beginning of a script is kept
+    // This is required for multi-part scripts, where the leading space
+    // is in the middle of the complete script
+
+    setup_and_run_cmd("run  a script starting with a space");
+    assert_no_error();
+
+    ASSERT_ONLY_CALL(script_run);
+    TEST_ASSERT_EQUAL_STRING(" a script starting with a space", script_run_fake.arg0_val);
+}
+
 TEST_CASE(run_script_no_args) {
     setup_and_run_cmd("run");
     assert_error();
@@ -203,6 +215,7 @@ int main(void) {
 
     RUN_TEST(test_run_script);
     RUN_TEST(test_run_script_with_spaces);
+    RUN_TEST(test_run_script_starting_with_space);
     RUN_TEST(test_run_script_no_args);
 
     RUN_TEST(test_invalid_command);
