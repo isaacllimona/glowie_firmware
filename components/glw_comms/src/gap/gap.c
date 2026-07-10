@@ -1,5 +1,6 @@
 #include <stdbool.h>
 
+#include "host/ble_att.h"
 #include "log.h"
 
 #include "nimble/ble.h"
@@ -145,6 +146,10 @@ static int on_gap_event(struct ble_gap_event *event, void *arg) {
             advertisement_start();
             return 0;
 
+        case BLE_GAP_EVENT_MTU:
+            LOGI("MTU updated to %d", event->mtu.value);
+            return 0;
+
         default:
             LOGI("unhandled GAP event; type=%d", event->type);
             return 0;
@@ -153,6 +158,7 @@ static int on_gap_event(struct ble_gap_event *event, void *arg) {
 }
 
 void gap_start(void){
+    ble_att_set_preferred_mtu(CONFIG_COMMS_BLE_MTU);
     advertisement_setup();
     advertisement_start();
 }
