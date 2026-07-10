@@ -1,12 +1,23 @@
 #pragma once
 
+#include "assert.h"
 #include "freertos/idf_additions.h"
+#include "freertos/projdefs.h"
 #include "freertos/task.h"
 #include "portmacro.h"
 
+#include "common.h"
+
+// ---- get time
+
+// Get a time in milliseconds
+static inline os_time_t os_time(void) {
+    return pdTICKS_TO_MS(xTaskGetTickCount());
+}
+
 // ---- delays
 
-static inline void os_delay(unsigned int time_ms) { vTaskDelay(time_ms / portTICK_PERIOD_MS); }
+static inline void os_delay(os_time_t time_ms) { vTaskDelay(time_ms / portTICK_PERIOD_MS); }
 
 // ---- timer
 

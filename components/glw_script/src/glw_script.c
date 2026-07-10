@@ -5,19 +5,24 @@
 #include "lauxlib.h"
 
 #include "log.h"
-#include "lua_libs/lua_led_lib.h"
-#include "lua_libs/lua_sys_lib.h"
+#include "builtin_lua_funcs.h"
 #include "glw_script_priv.h"
+#include "glw_script_task.h"
+#include "glw_script.h"
 
-
-static void register_libraries(lua_State *L) {
-    lua_led_lib_register(L);
-    lua_sys_lib_register(L);
+static bool wait_and_load_input(lua_State *L, glw_script_time_t timeout) {
+    char *script = wait_for_input(timeout);
+    if (script != NULL) {
+        luaL_loadstring(L, script);
+        release_input();
+        return true;
+    }
+    return false;
 }
 
 static void script_loop(lua_State *L) {
-    while(true) {
-        if(wait_and_load_input(L, max_timeout)) {
+    while (true) {
+        if (wait_and_load_input(L, max_timeout)) {
             int error = lua_pcall(L, 0, 0, 0);
             if (error != LUA_OK) {
                 LOGE("Error running script: %s", lua_tostring(L, -1));
@@ -34,16 +39,27 @@ void run_interpreter() {
     luaL_openlibs(L);
 
     LOGI("Registering glowie libraries to LUA...");
-    register_libraries(L);
+    builtin_lua_funcs_register(L);
 
     script_loop(L);
 }
 
-bool wait_and_load_input(lua_State *L, glw_script_time_t timeout) {
-    char script_buffer[INPUT_BUFFER_SIZE];
-    if (wait_for_input(script_buffer, timeout)) {
-        luaL_loadstring(L, script_buffer);
-        return true;
+void script_sleep(lua_State *L, int time) {
+    glw_script_time_t end_time = get_time_ms() + time;
+
+    glw_script_time_t timeout = time;
+    while (timeout > 0 && wait_and_load_input(L, timeout)) {
+        lua_call(L, 0, 0);
+        timeout = end_time - get_time_ms();
     }
-    return false;
+}
+
+void glw_script_init(const glw_script_init_t *init) { builtin_lua_funcs_init(init); }
+
+void glw_script_start(void) {
+    script_task_start(run_interpreter);
+}
+
+void glw_script_stop(void) {
+    script_task_cancel();
 }

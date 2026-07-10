@@ -17,7 +17,7 @@ static const char *startup_script = "v=0 while v<20 do v=v+2 led.setColorHSV(95,
 static void command_error_cb(char *msg) { LOGE("COMMAND ERROR: %s", msg); }
 
 static void run_script(const char *script) {
-    if(!glw_script_run_string(script)){
+    if(glw_script_run_string(script) != 0){
         LOGE("Could not run script. Another script is already queued.");
     }
 }
@@ -68,12 +68,11 @@ void app_main(void) {
 
     glw_led_init();
 
-    const lua_led_lib_cfg_t led_lib_cfg = {
+    const glw_script_init_t script_init = {
         .set_color_rgb = glw_led_set_color,
         .set_color_hsv = glw_led_set_color_hsv,
     };
-    lua_led_lib_cfg(&led_lib_cfg);
-
+    glw_script_init(&script_init);
     glw_script_start();
 
     run_script(startup_script);

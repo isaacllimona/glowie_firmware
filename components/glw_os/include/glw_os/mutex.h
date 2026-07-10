@@ -7,8 +7,7 @@
 #include "freertos/task.h"
 #include "portmacro.h"
 
-typedef unsigned int os_time_t;
-static const os_time_t os_max_timeout = 0xffffffffU;
+#include "common.h"
 
 typedef SemaphoreHandle_t os_mutex_handle_t;
 
