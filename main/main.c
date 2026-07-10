@@ -72,6 +72,7 @@ void app_main(void) {
     const glw_script_init_t script_init = {
         .set_color_rgb = glw_led_set_color,
         .set_color_hsv = glw_led_set_color_hsv,
+        .get_time = sync_clock_get
     };
     glw_script_init(&script_init);
     glw_script_start();

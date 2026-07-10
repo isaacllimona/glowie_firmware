@@ -5,6 +5,7 @@
 typedef struct {
     void (*set_color_rgb)(uint8_t r, uint8_t g, uint8_t b);  //< r, g, b between 0-255
     void (*set_color_hsv)(uint8_t h, uint8_t s, uint8_t v);  //< h between 0-159, s, v between 0-255
+    unsigned int (*get_time)(void);
 } glw_script_init_t;
 
 /** Configure the glw_script module */
