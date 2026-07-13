@@ -1,6 +1,7 @@
 #include <stdbool.h>
 
 #include "host/ble_att.h"
+#include "host/ble_gap.h"
 #include "log.h"
 
 #include "nimble/ble.h"
@@ -109,18 +110,14 @@ static int log_connection_details(uint16_t conn_handle) {
     return 0;
 }
 
-static struct {
-    bool connected;
-    uint16_t handle;
-} connection = {0};
+static uint16_t conn_handle = BLE_HS_CONN_HANDLE_NONE;
 
 static int on_gap_event(struct ble_gap_event *event, void *arg) {
     switch(event->type) {
         case BLE_GAP_EVENT_CONNECT:
             LOGI("connection %s", event->connect.status == 0 ? "established" : "failed");
             if(event->connect.status == 0) {
-                connection.connected = true;
-                connection.handle = event->connect.conn_handle;
+                conn_handle = event->connect.conn_handle;
 
                 int rc = log_connection_details(event->connect.conn_handle);
                 return rc;
@@ -132,7 +129,7 @@ static int on_gap_event(struct ble_gap_event *event, void *arg) {
 
         case BLE_GAP_EVENT_DISCONNECT:
             LOGI("disconnected from peer; reason=%d", event->disconnect.reason);
-            connection.connected = false;
+            conn_handle = BLE_HS_CONN_HANDLE_NONE;
             advertisement_start();
             return 0;
 
@@ -150,6 +147,10 @@ static int on_gap_event(struct ble_gap_event *event, void *arg) {
             LOGI("MTU updated to %d", event->mtu.value);
             return 0;
 
+        case BLE_GAP_EVENT_SUBSCRIBE:
+            LOGI("New subscription to attr: %u", event->subscribe.attr_handle);
+            return 0;
+
         default:
             LOGI("unhandled GAP event; type=%d", event->type);
             return 0;
@@ -163,8 +164,12 @@ void gap_start(void){
     advertisement_start();
 }
 
+uint16_t  gap_get_active_connection(void) {
+    return conn_handle;
+}
+
 void gap_disconnect(void) {
-    if(connection.connected) {
-        ble_gap_terminate(connection.handle, BLE_ERR_RD_CONN_TERM_PWROFF);
+    if(conn_handle != BLE_HS_CONN_HANDLE_NONE) {
+        ble_gap_terminate(conn_handle, BLE_ERR_RD_CONN_TERM_PWROFF);
     }
 }

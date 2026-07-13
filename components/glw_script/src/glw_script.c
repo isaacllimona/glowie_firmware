@@ -10,6 +10,10 @@
 #include "glw_script_task.h"
 #include "glw_script.h"
 
+static void (*output_error_cb)(const char *msg);
+
+static void output_error(const char *msg) { output_error_cb(msg); }
+
 static bool wait_and_load_input(lua_State *L, glw_script_time_t timeout) {
     char *script = wait_for_input(timeout);
     if (script != NULL) {
@@ -25,7 +29,8 @@ static void script_loop(lua_State *L) {
         if (wait_and_load_input(L, max_timeout)) {
             int error = lua_pcall(L, 0, 0, 0);
             if (error != LUA_OK) {
-                LOGE("Error running script: %s", lua_tostring(L, -1));
+                const char *err_msg = lua_tostring(L, -1);
+                output_error(err_msg);
                 lua_pop(L, 1);
             }
         }
@@ -54,7 +59,12 @@ void script_sleep(lua_State *L, int time) {
     }
 }
 
-void glw_script_init(const glw_script_init_t *init) { builtin_lua_funcs_init(init); }
+void glw_script_init(const glw_script_init_t *init) {
+    assert (init->output_error != NULL);
+    output_error_cb = init->output_error;
+
+    builtin_lua_funcs_init(init);
+}
 
 void glw_script_start(void) {
     script_task_start(run_interpreter);

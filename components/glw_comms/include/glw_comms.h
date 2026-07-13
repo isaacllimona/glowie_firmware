@@ -1,5 +1,7 @@
 #pragma once
 
+#include <strings.h>
+
 /** Callbacks for receiving data from the host */
 typedef struct {
     void (*command_cb)(char *input); //< get the received command as a null-terminated string.
@@ -12,3 +14,5 @@ typedef struct comms_init_t {
 void glw_comms_init(glw_comms_init_t init);
 
 void glw_comms_stop(void);
+
+void glw_comms_send_cmd_err(const char *prefix, const char *msg);

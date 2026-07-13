@@ -15,7 +15,14 @@
 
 static const char *startup_script = "v=0 while v<20 do v=v+2 led.setColorHSV(95,170,v) sys.sleep(30) end while v>0 do v=v-1 led.setColorHSV(95,170,v) sys.sleep(30) end";
 
-static void command_error_cb(char *msg) { LOGE("COMMAND ERROR: %s", msg); }
+static void command_err_cb(char *msg) {
+    LOGE("COMMAND ERROR: %s", msg);
+    glw_comms_send_cmd_err("(CMD) ", msg);
+}
+static void script_err_cb(const char *msg) {
+    LOGE("SCRIPT ERROR: %s", msg);
+    glw_comms_send_cmd_err("(SCRIPT) ", msg);
+}
 
 static void run_script(const char *script) {
     if(glw_script_run_string(script) != 0){
@@ -72,7 +79,8 @@ void app_main(void) {
     const glw_script_init_t script_init = {
         .set_color_rgb = glw_led_set_color,
         .set_color_hsv = glw_led_set_color_hsv,
-        .get_time = sync_clock_get
+        .get_time = sync_clock_get,
+        .output_error = script_err_cb,
     };
     glw_script_init(&script_init);
     glw_script_start();
@@ -84,7 +92,7 @@ void app_main(void) {
                                                                  .shutdown = shutdown,
                                                                  .script_run = run_script,
                                                                  .time_set = sync_clock_set},
-                                               .error_cb = command_error_cb};
+                                               .error_cb = command_err_cb};
     glw_command_setup(&command_setup);
 
     const glw_comms_init_t comms_init_struct = {.callbacks = {.command_cb = glw_command_run}};

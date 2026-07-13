@@ -53,3 +53,9 @@ void glw_comms_stop(void) {
         LOGE("Nimble port stop failed, rc = %d", rc);
     }
 }
+
+void glw_comms_send_cmd_err(const char *prefix, const char *output) {
+    uint16_t conn_handle = gap_get_active_connection();
+    if (conn_handle != BLE_HS_CONN_HANDLE_NONE)
+        gatt_send_cmd_err(conn_handle, prefix, output);
+}

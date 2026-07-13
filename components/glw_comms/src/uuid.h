@@ -11,3 +11,4 @@
 
 // ** Characteristics **
 #define UUID_CHAR_COMMAND       CUSTOM_UUID(0x0001)
+#define UUID_CHAR_CMD_OUT       CUSTOM_UUID(0x0002)
