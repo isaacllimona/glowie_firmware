@@ -13,7 +13,7 @@
 #include "log.h"
 #include "sync_clock.h"
 
-static const char *startup_script = "v=0 while v<20 do v=v+2 led.setColorHSV(95,170,v) sys.sleep(30) end while v>0 do v=v-1 led.setColorHSV(95,170,v) sys.sleep(30) end";
+static const char *startup_script = "v=0 while v<20 do v=v+2 setColorHSV(95,170,v) sleep(30) end while v>0 do v=v-1 setColorHSV(95,170,v) sleep(30) end";
 
 static void command_err_cb(char *msg) {
     LOGE("COMMAND ERROR: %s", msg);
