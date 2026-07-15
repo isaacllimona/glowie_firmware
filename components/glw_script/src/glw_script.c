@@ -10,6 +10,8 @@
 #include "glw_script_task.h"
 #include "glw_script.h"
 
+static const char *stop_error_msg = "Stopped";
+
 static void (*output_error_cb)(const char *msg);
 
 static void output_error(const char *msg) { output_error_cb(msg); }
@@ -30,7 +32,10 @@ static void script_loop(lua_State *L) {
             int error = lua_pcall(L, 0, 0, 0);
             if (error != LUA_OK) {
                 const char *err_msg = lua_tostring(L, -1);
-                output_error(err_msg);
+                // Do not output the error message on the error raised by script_stop()
+                if (strcmp(stop_error_msg, err_msg) != 0) {
+                    output_error(err_msg);
+                }
                 lua_pop(L, 1);
             }
         }
@@ -47,6 +52,12 @@ void run_interpreter() {
     builtin_lua_funcs_register(L);
 
     script_loop(L);
+}
+
+void script_stop(lua_State *L) {
+    // Stop the running script by raising an error
+    lua_pushstring(L, stop_error_msg);
+    lua_error(L);
 }
 
 void script_sleep(lua_State *L, int time) {

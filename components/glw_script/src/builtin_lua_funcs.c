@@ -21,8 +21,11 @@ static int lua_sleep(lua_State *L) {
     return 0;
 }
 
-/** Stop the running script by raising an error */
-static int lua_stop(lua_State *L) { return luaL_error(L, "Stopped"); }
+/** Stop the running script */
+static int lua_stop(lua_State *L) {
+    script_stop(L);
+    return 0;
+}
 
 static int lua_setColorRGB(lua_State *L) {
     int r = luaL_checkinteger(L, 1);
