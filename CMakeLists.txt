@@ -14,6 +14,11 @@ else()
     set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 endif()
 
+if(BUILD_TESTING)
+    add_subdirectory(test)
+    add_compile_definitions(BUILD_TESTING)
+endif()
+
 add_subdirectory(main)
 add_subdirectory(components/bmi160)
 add_subdirectory(components/glw_os)
@@ -25,10 +30,6 @@ add_subdirectory(components/glw_script)
 add_subdirectory(components/glw_sys)
 add_subdirectory(components/glw_commands)
 add_subdirectory(components/glw_imu)
-
-if(BUILD_TESTING)
-    add_subdirectory(test)
-endif()
 
 if(NOT BUILD_NATIVE)
     glw_idf_add_main_app(main)

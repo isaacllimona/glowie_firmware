@@ -3,16 +3,29 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+typedef uint8_t glw_led_rgb_comp_t;
+
 void glw_led_init(void);
 
 /* Enable/disable the LEDs */
 void glw_led_set_enabled(bool enabled);
 
-/* Set color as RGB, with each component ranging from 0-255 */
-void glw_led_set_color(uint8_t red, uint8_t green, uint8_t blue);
-
-/* Set color in HSV space, with h: 0-179, s: 0-255, v: 0-255 */
-void glw_led_set_color_hsv(uint8_t h, uint8_t s, uint8_t v);
-
 /* Set a brightness modifier, from 0-255 */
 void glw_led_set_brightness(uint8_t brightness);
+
+/**
+ * Set the color of all pixels
+ *
+ * The color is given as RGB, with each component ranging from 0-255.
+ */
+void glw_led_set_color(glw_led_rgb_comp_t red, glw_led_rgb_comp_t green, glw_led_rgb_comp_t blue);
+
+/**
+ * Set the color of a single pixel.
+ *
+ * The color is given as RGB, with each component ranging from 0-255.
+ * The color change is not applied automatically.
+ * Call glw_led_update() after setting all pixels to apply the change.
+ */
+void glw_led_set_pixel_color(glw_led_rgb_comp_t red, glw_led_rgb_comp_t green, glw_led_rgb_comp_t blue, int index);
+void glw_led_update(void);
