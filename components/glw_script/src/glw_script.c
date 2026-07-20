@@ -13,8 +13,9 @@
 static const char *stop_error_msg = "Stopped";
 
 static void (*output_error_cb)(const char *msg);
-
 static void output_error(const char *msg) { output_error_cb(msg); }
+
+static lua_State *L;
 
 static bool wait_and_load_input(lua_State *L, glw_script_time_t timeout) {
     char *script = wait_for_input(timeout);
@@ -44,7 +45,7 @@ static void script_loop(lua_State *L) {
 
 void run_interpreter() {
     LOGI("Creating LUA state...");
-    lua_State *L = luaL_newstate();
+    L = luaL_newstate();
     assert(L != NULL);
     luaL_openlibs(L);
 
@@ -52,6 +53,12 @@ void run_interpreter() {
     builtin_lua_funcs_register(L);
 
     script_loop(L);
+}
+
+void add_lua_library(const luaL_Reg *lib_funcs, const char *name) {
+    lua_newtable(L);
+    luaL_setfuncs(L, lib_funcs, 0);
+    lua_setglobal(L, name);
 }
 
 void script_stop(lua_State *L) {
@@ -69,6 +76,8 @@ void script_sleep(lua_State *L, int time) {
         timeout = end_time - get_time_ms();
     }
 }
+
+// ======== PUBLIC API =========
 
 void glw_script_init(const glw_script_init_t *init) {
     assert (init->output_error != NULL);

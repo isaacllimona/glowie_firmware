@@ -43,6 +43,7 @@ glw_add_module(${TARGET}
         src/glw_script.c
         src/glw_script_task.c
         src/builtin_lua_funcs.c
+        src/lua_libs/led.c
     INCLUDE_PRIVATE lua src
     DEPENDS glw_log glw_os
 )

@@ -7,13 +7,18 @@
 #include "glw_comms.h"
 #include "glw_led.h"
 #include "glw_script.h"
+#include "glw_script_libs/led.h"
 #include "glw_sys.h"
 #include "glw_os/time.h"
 
 #include "log.h"
 #include "sync_clock.h"
 
-static const char *startup_script = "v=0 while v<20 do v=v+2 setColorHSV(95,170,v) sleep(30) end while v>0 do v=v-1 setColorHSV(95,170,v) sleep(30) end";
+static const char *startup_script =
+    "local function fade(val) led.setColor(math.floor(84*val), math.floor(227*val), math.floor(255*val)) end"
+    " local v=0; while v<0.1 do fade(v) v=v+0.01 sleep(30) end"
+    " while v>=0 do fade(v) v=v-0.005 sleep(30) end"
+    " led.setColor(0, 0, 0)";
 
 static void command_err_cb(char *msg) {
     LOGE("COMMAND ERROR: %s", msg);
@@ -77,13 +82,18 @@ void app_main(void) {
     glw_led_init();
 
     const glw_script_init_t script_init = {
-        .set_color_rgb = glw_led_set_color,
-        .set_color_hsv = glw_led_set_color_hsv,
         .get_time = sync_clock_get,
         .output_error = script_err_cb,
     };
     glw_script_init(&script_init);
     glw_script_start();
+
+    const glw_script_libs_led_init_t script_led_lib_init = {
+        .set_color_rgb = glw_led_set_color,
+        .set_pixel_color_rgb = glw_led_set_pixel_color,
+        .update = glw_led_update
+    };
+    glw_script_libs_led_add(&script_led_lib_init);
 
     run_script(startup_script);
 
