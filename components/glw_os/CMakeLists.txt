@@ -1,10 +1,18 @@
-glw_exclude_from_native_build()
-
 set(TARGET glw_os)
 
-glw_add_module(${TARGET}
-    SOURCES
-        src/dummy.c
+set(SOURCES
+    src/shared_buffers.c
 )
 
-link_idf_components(${TARGET} PUBLIC freertos)
+if(NOT BUILD_NATIVE)
+    link_idf_components(${TARGET} PUBLIC freertos)
+endif()
+
+glw_add_module(${TARGET}
+    SOURCES "${SOURCES}"
+)
+
+if(BUILD_NATIVE)
+    target_include_directories(${TARGET} BEFORE PRIVATE test/native/mock)
+    target_link_libraries(${TARGET} PRIVATE fff)
+endif()
