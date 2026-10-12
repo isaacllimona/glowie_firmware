@@ -81,7 +81,7 @@ static void cmd_run(char *args) {
 
 // ====================================================
 
-void glw_command_setup(const glw_command_setup_t *setup) {
+void glw_command_init(const glw_command_setup_t *setup) {
     assert(setup->cmd_callbacks.led_en != NULL);
     assert(setup->cmd_callbacks.brightness_set != NULL);
     assert(setup->cmd_callbacks.script_run != NULL);

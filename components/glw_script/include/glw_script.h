@@ -5,7 +5,7 @@
 
 typedef struct {
     unsigned int (*get_time)(void);
-    void (*output_error)(const char* msg);
+    void (*error_cb)(const char* msg);
 } glw_script_init_t;
 
 /** Configure the glw_script module */

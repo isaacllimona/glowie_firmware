@@ -32,7 +32,7 @@ const glw_command_setup_t command_setup = {
 };
 
 static void setup_and_run_cmd(char *cmd) {
-    glw_command_setup(&command_setup);
+    glw_command_init(&command_setup);
     glw_command_run(cmd);
 }
 

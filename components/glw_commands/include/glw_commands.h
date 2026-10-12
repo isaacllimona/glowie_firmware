@@ -18,6 +18,6 @@ typedef struct {
     error_cb_t error_cb;
 } glw_command_setup_t;
 
-void glw_command_setup(const glw_command_setup_t *setup);
+void glw_command_init(const glw_command_setup_t *setup);
 
 void glw_command_run(char *input);

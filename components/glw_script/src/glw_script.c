@@ -80,8 +80,8 @@ void script_sleep(lua_State *L, int time) {
 // ======== PUBLIC API =========
 
 void glw_script_init(const glw_script_init_t *init) {
-    assert (init->output_error != NULL);
-    output_error_cb = init->output_error;
+    assert (init->error_cb != NULL);
+    output_error_cb = init->error_cb;
 
     builtin_lua_funcs_init(init);
 }

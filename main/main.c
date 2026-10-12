@@ -48,10 +48,12 @@ static void shutdown(void) {
 
     LOGI("Shutdown requested. Cleaning up...");
 
-    // Turn off the LEDs. Just required if the hardware does not disconnect the LEDs on shutdown
+    // Stop running script and turn off the LEDs.
+    // Just required if the hardware does not disconnect the LEDs on shutdown
     glw_script_stop();
     glw_led_set_color(0,0,0);
 
+    // Stop the communications module to disconnect the controller and prevent it from reconnecting
     glw_comms_stop();
 
     LOGI("BLE stopped. Shutting down...");
@@ -60,12 +62,13 @@ static void shutdown(void) {
 }
 
 static void set_led_enabled(bool enabled) {
-    // Power on/off the LEDs with the LED enable GPIO
+    // Power on/off the LEDs with the LED enable GPIO (hardware power switch)
     glw_sys_led_en(enabled);
 
-    // Refresh the LEDs to the previous state after power on
-    // Also light off the LEDs even if the hardware does not support GPIO LED disabling
-    os_delay(10);  // Wait for the LEDs to power on. TODO: tune delay
+    // Enable/disable LEDs from the LED module
+    // This causes the LEDs to refresh after power on
+    // It also disables the LEDs in software in case the hardware does not support GPIO LED disabling.
+    os_delay(10);  // Wait for the LEDs to power on
     glw_led_set_enabled(enabled);
 }
 
@@ -83,7 +86,7 @@ void app_main(void) {
 
     const glw_script_init_t script_init = {
         .get_time = sync_clock_get,
-        .output_error = script_err_cb,
+        .error_cb = script_err_cb,
     };
     glw_script_init(&script_init);
     glw_script_start();
@@ -103,7 +106,7 @@ void app_main(void) {
                                                                  .script_run = run_script,
                                                                  .time_set = sync_clock_set},
                                                .error_cb = command_err_cb};
-    glw_command_setup(&command_setup);
+    glw_command_init(&command_setup);
 
     const glw_comms_init_t comms_init_struct = {.callbacks = {.command_cb = glw_command_run}};
     glw_comms_init(comms_init_struct);
