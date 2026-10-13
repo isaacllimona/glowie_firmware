@@ -8,6 +8,11 @@ Main features:
 - BLE remote control.
 - Power and battery management.
 
+Related repos:
+- PCB project: [glowie](https://github.com/isaacllimona/glowie)
+- APP for remote control: [glowie_app](https://github.com/isaacllimona/glowie_app)
+- LUA library to create light patterns: [glowie_effects](https://github.com/isaacllimona/glowie_effects)
+
 ## Hardware
 
 - **Microcontroller**: glowie_firmware is being developed for the ESP32-C3 microcontroller, though it should work on other ESP32 variants.
