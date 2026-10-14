@@ -11,6 +11,7 @@ shared_buffer_pool_handle shared_buffer_pool_create(char *memory, unsigned int b
 
     SET_CONST(unsigned int, pool->buffer_size, buffer_size);
     pool->mutex = os_mutex_create();
+    pool->head = NULL;
 
     for(int i = 0; i < num_buffers; i++) {
         // allocate item struct

@@ -10,7 +10,6 @@
 static char pool_mem[TEST_POOL_MEM_SIZE];
 
 static shared_buffer_pool_handle make_pool(unsigned int num_buffers) {
-    memset(pool_mem, 0, TEST_POOL_MEM_SIZE);
     return shared_buffer_pool_create(pool_mem, TEST_BUFFER_SIZE, num_buffers);
 }
 
