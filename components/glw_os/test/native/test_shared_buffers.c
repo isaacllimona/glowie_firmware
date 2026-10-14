@@ -58,7 +58,7 @@ TEST_CASE(alloc_returns_initialized_buffer) {
 
     assert_valid_buffer_in_pool(buffer);
     TEST_ASSERT_EQUAL_PTR(pool, buffer->pool);
-    TEST_ASSERT_EQUAL(0, buffer->size);
+    TEST_ASSERT_EQUAL(0, buffer->len);
     TEST_ASSERT_EQUAL(1, buffer->owner_count);
     TEST_ASSERT_NULL(buffer->next);
     TEST_ASSERT_TRUE((char *) buffer->data >= pool_mem);
@@ -174,7 +174,7 @@ TEST_CASE(alloc_size_single_buffer_fit) {
     shared_buffer_handle buffer = shared_buffer_alloc_size(pool, TEST_BUFFER_SIZE);
 
     assert_valid_buffer_in_pool(buffer);
-    TEST_ASSERT_EQUAL(0, buffer->size);
+    TEST_ASSERT_EQUAL(0, buffer->len);
     TEST_ASSERT_NULL(buffer->next);
 }
 
@@ -200,6 +200,84 @@ TEST_CASE(alloc_size_fills_buffer_partially) {
     TEST_ASSERT_NULL(buffer->next->next);
 }
 
+// --- append string
+
+TEST_CASE(append_string_smaller_than_buffer) {
+    shared_buffer_pool_handle pool = make_pool(4);
+    shared_buffer_handle buffer = shared_buffer_alloc(pool);
+
+    const char *str = "hello";
+
+    TEST_ASSERT_EQUAL(0, shared_buffer_append_string(buffer, str));
+    TEST_ASSERT_EQUAL(strlen(str), buffer->len);
+    TEST_ASSERT_EQUAL_MEMORY(str, buffer->data, strlen(str));
+}
+
+TEST_CASE(append_string_equal_to_buffer) {
+    shared_buffer_pool_handle pool = make_pool(4);
+    shared_buffer_handle buffer = shared_buffer_alloc(pool);
+
+    char str[TEST_BUFFER_SIZE + 1];
+    memset(str, 'a', TEST_BUFFER_SIZE);
+    str[TEST_BUFFER_SIZE] = 0;
+
+    TEST_ASSERT_EQUAL(0, shared_buffer_append_string(buffer, str));
+    TEST_ASSERT_EQUAL(TEST_BUFFER_SIZE, buffer->len);
+    TEST_ASSERT_EQUAL_MEMORY(str, buffer->data, TEST_BUFFER_SIZE);
+}
+
+TEST_CASE(append_string_spans_multiple_buffers) {
+    shared_buffer_pool_handle pool = make_pool(4);
+    shared_buffer_handle buffer = shared_buffer_alloc_size(pool, 3 * TEST_BUFFER_SIZE);
+
+    unsigned int str_len = 2 * TEST_BUFFER_SIZE + 5;
+    char str[3 * TEST_BUFFER_SIZE];
+    for (unsigned int i = 0; i < str_len; i++) str[i] = 'a' + (i % 26);
+    str[str_len] = 0;
+
+    TEST_ASSERT_EQUAL(0, shared_buffer_append_string(buffer, str));
+
+    TEST_ASSERT_EQUAL(TEST_BUFFER_SIZE, buffer->len);
+    TEST_ASSERT_EQUAL(TEST_BUFFER_SIZE, buffer->next->len);
+    TEST_ASSERT_EQUAL(5, buffer->next->next->len);
+
+    TEST_ASSERT_EQUAL_MEMORY(str, buffer->data, TEST_BUFFER_SIZE);
+    TEST_ASSERT_EQUAL_MEMORY(str + TEST_BUFFER_SIZE, buffer->next->data, TEST_BUFFER_SIZE);
+    TEST_ASSERT_EQUAL_MEMORY(str + 2 * TEST_BUFFER_SIZE, buffer->next->next->data, 5);
+}
+
+TEST_CASE(append_string_too_small_buffer_returns_error) {
+    shared_buffer_pool_handle pool = make_pool(4);
+    shared_buffer_handle buffer = shared_buffer_alloc(pool);
+
+    char str[TEST_BUFFER_SIZE + 2];
+    memset(str, 'a', TEST_BUFFER_SIZE + 1);
+    str[TEST_BUFFER_SIZE + 1] = 0;
+
+    TEST_ASSERT_EQUAL(-1, shared_buffer_append_string(buffer, str));
+}
+
+TEST_CASE(append_string_to_full_buffer_returns_error) {
+    shared_buffer_pool_handle pool = make_pool(4);
+    shared_buffer_handle buffer = shared_buffer_alloc(pool);
+    buffer->len = TEST_BUFFER_SIZE;
+
+    TEST_ASSERT_EQUAL(-1, shared_buffer_append_string(buffer, "x"));
+}
+
+TEST_CASE(append_string_to_partially_full_buffer) {
+    shared_buffer_pool_handle pool = make_pool(4);
+    shared_buffer_handle buffer = shared_buffer_alloc(pool);
+    memset(buffer->data, 'x', 10);
+    buffer->len = 10;
+
+    const char *str = "hello";
+
+    TEST_ASSERT_EQUAL(0, shared_buffer_append_string(buffer, str));
+    TEST_ASSERT_EQUAL(10 + strlen(str), buffer->len);
+    TEST_ASSERT_EQUAL_MEMORY(str, buffer->data + 10, strlen(str));
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -219,6 +297,13 @@ int main(void) {
     RUN_TEST(test_alloc_size_single_buffer_fit);
     RUN_TEST(test_alloc_size_spans_multiple_buffers);
     RUN_TEST(test_alloc_size_fills_buffer_partially);
+
+    RUN_TEST(test_append_string_smaller_than_buffer);
+    RUN_TEST(test_append_string_equal_to_buffer);
+    RUN_TEST(test_append_string_spans_multiple_buffers);
+    RUN_TEST(test_append_string_too_small_buffer_returns_error);
+    RUN_TEST(test_append_string_to_full_buffer_returns_error);
+    RUN_TEST(test_append_string_to_partially_full_buffer);
 
     return UNITY_END();
 }
