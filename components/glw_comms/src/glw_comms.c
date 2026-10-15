@@ -1,61 +1,36 @@
-#include "nimble/nimble_port.h"
-#include "nimble/nimble_port_freertos.h"
-#include "host/ble_hs.h"
-
-#include "log.h"
-#include "gatt/gatt.h"
-#include "gap/gap.h"
+#include "glw_comms_ble.h"
+#include "glw_comms_commands.h"
 
 #include "glw_comms.h"
 
-void ble_store_config_init(void);
-
-static void on_reset(int reason) {
-    LOGW("Resetting BLE stack; reason=%d\n", reason);
-}
-
-static void on_sync(void) {
-    LOGI("BLE stack synchronized");
-    gap_start();
-}
-
-static void host_task(void *param) {
-    LOGI("BLE host task started");
-    nimble_port_run();
-
-    LOGE("BLE host stopped");
-    nimble_port_freertos_deinit();
-}
-
-void glw_comms_init(glw_comms_init_t init) {
-    esp_err_t ret = nimble_port_init();
-    ESP_ERROR_CHECK(ret);
-
-    ble_hs_cfg.reset_cb = on_reset;
-    ble_hs_cfg.sync_cb = on_sync;
-    ble_hs_cfg.store_status_cb = ble_store_util_status_rr;
-
-    ble_store_config_init();
-
-    gatt_init_t gatt_init_struct = {.callbacks = init.callbacks};
-    gatt_init(gatt_init_struct);
-
-    nimble_port_freertos_init(host_task);
-}
-
-void glw_comms_stop(void) {
-    gap_disconnect();
-
-    int rc = nimble_port_stop();
-    if (rc == 0) {
-        nimble_port_deinit();
-    } else {
-        LOGE("Nimble port stop failed, rc = %d", rc);
+static glw_comms_ble_error_t on_command(const char *cmd) {
+    glw_comms_commands_error_t ret = glw_comms_commands_run(cmd);
+    switch(ret) {
+        case CMD_ERR_BAD_ARGUMENTS:
+            return BLE_ERR_BAD_COMMAND;
+        case CMD_ERR_UNKNOWN_COMMAND:
+            return BLE_ERR_BAD_COMMAND;
+        case CMD_ERR_OK:
+            return 0;
     }
 }
 
-void glw_comms_send_cmd_err(const char *prefix, const char *output) {
-    uint16_t conn_handle = gap_get_active_connection();
-    if (conn_handle != BLE_HS_CONN_HANDLE_NONE)
-        gatt_send_cmd_err(conn_handle, prefix, output);
+void glw_comms_init(glw_comms_init_t init) {
+    glw_comms_ble_init_t ble_init = {
+        .command_cb = on_command
+    };
+    glw_comms_ble_init(ble_init);
+
+    glw_comms_commands_init_t cmd_init = {
+        .callbacks = init.callbacks
+    };
+    glw_comms_commands_init(cmd_init);
+}
+
+void glw_comms_stop(void) {
+    glw_comms_ble_stop();
+}
+
+void glw_comms_send_err(const char *prefix, const char *msg) {
+    glw_comms_ble_send_cmd_err(prefix, msg);
 }

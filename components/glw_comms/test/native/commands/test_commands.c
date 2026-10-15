@@ -2,38 +2,28 @@
 
 #include "native_test_common.h"
 
-#include "glw_commands.h"
+#include "glw_comms_commands.h"
+#include "unity.h"
 
 FAKE_VOID_FUNC(led_en, bool);
 FAKE_VOID_FUNC(brightness_set, uint8_t);
 FAKE_VOID_FUNC(shutdown);
 FAKE_VOID_FUNC(script_run, const char *);
-FAKE_VOID_FUNC(time_set, unsigned long);
+FAKE_VOID_FUNC(time_set, unsigned int);
 
-FAKE_VOID_FUNC(error_cb, char *);
-
-static void assert_no_error() {
-    TEST_ASSERT_EQUAL_MESSAGE(0, error_cb_fake.call_count, error_cb_fake.arg0_val);
-}
-
-static void assert_error() {
-    ASSERT_ONLY_CALL(error_cb);
-}
-
-const glw_command_setup_t command_setup = {
-    .cmd_callbacks = {
+const glw_comms_commands_init_t commands_setup = {
+    .callbacks = {
         .led_en = led_en,
         .brightness_set = brightness_set,
         .shutdown = shutdown,
         .script_run = script_run,
         .time_set = time_set
     },
-    .error_cb = error_cb
 };
 
-static void setup_and_run_cmd(char *cmd) {
-    glw_command_init(&command_setup);
-    glw_command_run(cmd);
+static glw_comms_commands_error_t setup_and_run_cmd(char *cmd) {
+    glw_comms_commands_init(commands_setup);
+    return glw_comms_commands_run(cmd);
 }
 
 void setUp() {
@@ -42,8 +32,6 @@ void setUp() {
     RESET_FAKE(shutdown);
     RESET_FAKE(script_run);
     RESET_FAKE(time_set);
-
-    RESET_FAKE(error_cb);
 
     FFF_RESET_HISTORY();
 }
@@ -54,65 +42,56 @@ void tearDown() {}
 // --- led_en
 
 TEST_CASE(led_enable) {
-    setup_and_run_cmd("led_en 1");
-    assert_no_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_OK, setup_and_run_cmd("led_en 1"));
 
     ASSERT_ONLY_CALL(led_en);
     TEST_ASSERT_EQUAL(true, led_en_fake.arg0_val);
 }
 
 TEST_CASE(led_disable) {
-    setup_and_run_cmd("led_en 0");
-    assert_no_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_OK, setup_and_run_cmd("led_en 0"));
 
     ASSERT_ONLY_CALL(led_en);
     TEST_ASSERT_EQUAL(false, led_en_fake.arg0_val);
 }
 
 TEST_CASE(led_enable_no_args) {
-    setup_and_run_cmd("led_en");
-    assert_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_BAD_ARGUMENTS, setup_and_run_cmd("led_en"));
 }
 
 TEST_CASE(led_enable_wrong_args) {
-    setup_and_run_cmd("led_en 2");
-    assert_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_BAD_ARGUMENTS, setup_and_run_cmd("led_en 2"));
 }
 
 // --- brightness_set
 
 TEST_CASE(brightness_set_0) {
-    setup_and_run_cmd("brightness_set 0");
-    assert_no_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_OK, setup_and_run_cmd("brightness_set 0"));
 
     ASSERT_ONLY_CALL(brightness_set);
     TEST_ASSERT_EQUAL(0, brightness_set_fake.arg0_val);
 }
 
 TEST_CASE(brightness_set_255) {
-    setup_and_run_cmd("brightness_set 255");
-    assert_no_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_OK, setup_and_run_cmd("brightness_set 255"));
 
     ASSERT_ONLY_CALL(brightness_set);
     TEST_ASSERT_EQUAL(255, brightness_set_fake.arg0_val);
 }
 
 TEST_CASE(brightness_set_negative) {
-    setup_and_run_cmd("brightness_set -1");
-    assert_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_BAD_ARGUMENTS, setup_and_run_cmd("brightness_set -1"));
 
 }
 
 TEST_CASE(brightness_set_too_large) {
-    setup_and_run_cmd("brightness_set 256");
-    assert_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_BAD_ARGUMENTS, setup_and_run_cmd("brightness_set 256"));
 }
 
 // --- shutdown
 
 TEST_CASE(shutdown) {
-    setup_and_run_cmd("shutdown");
-    assert_no_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_OK, setup_and_run_cmd("shutdown"));
 
     ASSERT_ONLY_CALL(shutdown);
 }
@@ -120,49 +99,42 @@ TEST_CASE(shutdown) {
 // --- time_set
 
 TEST_CASE(time_set_zero) {
-    setup_and_run_cmd("time_set 0");
-    assert_no_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_OK, setup_and_run_cmd("time_set 0"));
 
     ASSERT_ONLY_CALL(time_set);
     TEST_ASSERT_EQUAL(0, time_set_fake.arg0_val);
 }
 
 TEST_CASE(time_set_large_value) {
-    setup_and_run_cmd("time_set 4294967295");
-    assert_no_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_OK, setup_and_run_cmd("time_set 4294967295"));
 
     ASSERT_ONLY_CALL(time_set);
     TEST_ASSERT_EQUAL(4294967295, time_set_fake.arg0_val);
 }
 
 TEST_CASE(time_set_no_args) {
-    setup_and_run_cmd("time_set");
-    assert_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_BAD_ARGUMENTS, setup_and_run_cmd("time_set"));
 }
 
 TEST_CASE(time_set_negative) {
-    setup_and_run_cmd("time_set -1");
-    assert_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_BAD_ARGUMENTS, setup_and_run_cmd("time_set -1"));
 }
 
 TEST_CASE(time_set_extra_args) {
-    setup_and_run_cmd("time_set 100 extra");
-    assert_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_BAD_ARGUMENTS, setup_and_run_cmd("time_set 100 extra"));
 }
 
 // --- script_run (via "run" command)
 
 TEST_CASE(run_script) {
-    setup_and_run_cmd("run my_script");
-    assert_no_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_OK, setup_and_run_cmd("run my_script"));
 
     ASSERT_ONLY_CALL(script_run);
     TEST_ASSERT_EQUAL_STRING("my_script", script_run_fake.arg0_val);
 }
 
 TEST_CASE(run_script_with_spaces) {
-    setup_and_run_cmd("run my long script");
-    assert_no_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_OK, setup_and_run_cmd("run my long script"));
 
     ASSERT_ONLY_CALL(script_run);
     TEST_ASSERT_EQUAL_STRING("my long script", script_run_fake.arg0_val);
@@ -173,23 +145,20 @@ TEST_CASE(run_script_starting_with_space) {
     // This is required for multi-part scripts, where the leading space
     // is in the middle of the complete script
 
-    setup_and_run_cmd("run  a script starting with a space");
-    assert_no_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_OK, setup_and_run_cmd("run  a script starting with a space"));
 
     ASSERT_ONLY_CALL(script_run);
     TEST_ASSERT_EQUAL_STRING(" a script starting with a space", script_run_fake.arg0_val);
 }
 
 TEST_CASE(run_script_no_args) {
-    setup_and_run_cmd("run");
-    assert_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_BAD_ARGUMENTS, setup_and_run_cmd("run"));
 }
 
 // --- invalid command
 
 TEST_CASE(invalid_command) {
-    setup_and_run_cmd("invalid_cmd");
-    assert_error();
+    TEST_ASSERT_EQUAL(CMD_ERR_UNKNOWN_COMMAND, setup_and_run_cmd("invalid_cmd"));
 }
 
 int main(void) {

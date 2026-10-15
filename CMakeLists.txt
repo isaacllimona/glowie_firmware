@@ -28,7 +28,6 @@ add_subdirectory(components/glw_inrt)
 add_subdirectory(components/glw_led)
 add_subdirectory(components/glw_script)
 add_subdirectory(components/glw_sys)
-add_subdirectory(components/glw_commands)
 add_subdirectory(components/glw_imu)
 
 if(NOT BUILD_NATIVE)

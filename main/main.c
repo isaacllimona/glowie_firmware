@@ -3,7 +3,6 @@
 #include "glw_os/task.h"
 #include "nvs_flash.h"
 
-#include "glw_commands.h"
 #include "glw_comms.h"
 #include "glw_led.h"
 #include "glw_script.h"
@@ -20,13 +19,9 @@ static const char *startup_script =
     " while v>=0 do fade(v) v=v-0.005 sleep(30) end"
     " led.setColor(0, 0, 0)";
 
-static void command_err_cb(char *msg) {
-    LOGE("COMMAND ERROR: %s", msg);
-    glw_comms_send_cmd_err("(CMD) ", msg);
-}
 static void script_err_cb(const char *msg) {
     LOGE("SCRIPT ERROR: %s", msg);
-    glw_comms_send_cmd_err("(SCRIPT) ", msg);
+    glw_comms_send_err("(SCRIPT) ", msg);
 }
 
 static void run_script(const char *script) {
@@ -100,15 +95,15 @@ void app_main(void) {
 
     run_script(startup_script);
 
-    const glw_command_setup_t command_setup = {.cmd_callbacks = {.led_en = set_led_enabled,
-                                                                 .brightness_set = glw_led_set_brightness,
-                                                                 .shutdown = shutdown,
-                                                                 .script_run = run_script,
-                                                                 .time_set = sync_clock_set},
-                                               .error_cb = command_err_cb};
-    glw_command_init(&command_setup);
-
-    const glw_comms_init_t comms_init_struct = {.callbacks = {.command_cb = glw_command_run}};
+    const glw_comms_init_t comms_init_struct = {
+        .callbacks = {
+            .led_en = set_led_enabled,
+            .brightness_set = glw_led_set_brightness,
+            .shutdown = shutdown,
+            .script_run = run_script,
+            .time_set = sync_clock_set
+        }
+    };
     glw_comms_init(comms_init_struct);
 
     while (1) {

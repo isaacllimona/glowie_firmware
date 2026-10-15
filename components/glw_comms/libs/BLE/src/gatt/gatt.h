@@ -2,10 +2,10 @@
 
 #include <stdint.h>
 
-#include "glw_comms.h"
+#include "glw_comms_ble.h"
 
 typedef struct gatt_init_t {
-    glw_comms_callbacks_t callbacks;
+    command_cb_t command_cb;
 } gatt_init_t;
 
 int gatt_init(gatt_init_t init);

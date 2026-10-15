@@ -1,8 +1,6 @@
 #include <string.h>
 #include <assert.h>
 
-#include "log.h"
-
 #include "host/ble_att.h"
 #include "host/ble_gatt.h"
 #include "host/ble_hs_mbuf.h"
@@ -10,9 +8,10 @@
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
 
+#include "log.h"
 #include "config.h"
-#include "glw_comms.h"
 #include "uuid.h"
+
 #include "gatt.h"
 
 #define COMMS_COMMAND_BUFFER_SIZE   CONFIG_COMMS_COMMAND_BUFFER_SIZE
@@ -20,7 +19,7 @@
 static_assert(strlen(CONFIG_DEVICE_NAME) <= MYNEWT_VAL_BLE_SVC_GAP_DEVICE_NAME_MAX_LENGTH,
               "Device name too long");
 
-static glw_comms_callbacks_t callbacks;
+static command_cb_t command_cb;
 static uint16_t conn_handle;
 
 // ===============================================
@@ -82,9 +81,8 @@ static int on_command(uint16_t conn_handle, uint16_t attr_handle, struct ble_gat
 
     LOGD("Received %u bytes of command input: %s", written_len, input_buffer);
 
-    callbacks.command_cb(input_buffer);
-
-    return 0;
+    glw_comms_ble_error_t ret = command_cb(input_buffer);
+    return ret;
 }
 
 static int on_cmd_out(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg) {
@@ -97,7 +95,7 @@ static int on_cmd_out(uint16_t conn_handle, uint16_t attr_handle, struct ble_gat
 // ===============================================
 
 int gatt_init(gatt_init_t init) {
-    callbacks = init.callbacks;
+    command_cb = init.command_cb;
 
     int rc;
 

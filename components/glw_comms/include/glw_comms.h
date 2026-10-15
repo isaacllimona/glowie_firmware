@@ -1,10 +1,15 @@
 #pragma once
 
 #include <strings.h>
+#include <stdbool.h>
+#include <stdint.h>
 
-/** Callbacks for receiving data from the host */
 typedef struct {
-    void (*command_cb)(char *input); //< get the received command as a null-terminated string.
+    void (*led_en)(bool enabled);
+    void (*brightness_set)(uint8_t value);
+    void (*shutdown)(void);
+    void (*script_run)(const char* script);
+    void (*time_set)(unsigned int ms);
 } glw_comms_callbacks_t;
 
 typedef struct comms_init_t {
@@ -15,4 +20,4 @@ void glw_comms_init(glw_comms_init_t init);
 
 void glw_comms_stop(void);
 
-void glw_comms_send_cmd_err(const char *prefix, const char *msg);
+void glw_comms_send_err(const char *prefix, const char *msg);

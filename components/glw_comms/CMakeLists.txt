@@ -1,13 +1,28 @@
-glw_exclude_from_native_build()
+add_subdirectory(libs/BLE)
+add_subdirectory(libs/commands)
+
+if(BUILD_TESTING)
+    add_subdirectory(test)
+endif()
+
+if(BUILD_NATIVE)
+    return()
+endif()
 
 set(TARGET glw_comms)
 
-glw_add_module(${TARGET}
-    SOURCES
-        src/glw_comms.c
-        src/gap/gap.c
-        src/gatt/gatt.c
-    DEPENDS glw_log
+add_library(${TARGET} STATIC
+    src/glw_comms.c
 )
 
-link_idf_components(${TARGET} PRIVATE bt)
+target_include_directories(${TARGET}
+PUBLIC
+    include
+PRIVATE
+    src
+)
+
+target_link_libraries(${TARGET} PRIVATE
+    glw_log glw_os
+    glw_comms_ble glw_comms_commands
+)

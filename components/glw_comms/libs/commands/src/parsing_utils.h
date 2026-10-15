@@ -7,7 +7,7 @@
 
 static bool argparse__is_delimiter(char c) { return c == ' '; }
 
-static bool argparse_check_cmd(char *input, char *command, char **args) {
+static bool argparse_check_cmd(const char *input, const char *command, const char **args) {
     // compare given command with input
     while (*command != 0) {
         if (*input != *command)
@@ -28,7 +28,7 @@ static bool argparse_check_cmd(char *input, char *command, char **args) {
     return true;
 }
 
-static bool argparse_parse_ulong(char *input, unsigned long *value, char **next) {
+static bool argparse_parse_ulong(const char *input, unsigned long *value, const char **next) {
     // strtoul does not set an error if the input is negative. Check manually
     if (*input == '-')
         return false;
