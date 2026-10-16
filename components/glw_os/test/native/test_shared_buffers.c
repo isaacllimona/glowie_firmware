@@ -278,6 +278,28 @@ TEST_CASE(append_string_to_partially_full_buffer) {
     TEST_ASSERT_EQUAL_MEMORY(str, buffer->data + 10, strlen(str));
 }
 
+// --- pool required memory macro
+
+TEST_CASE(pool_memory_macro_covers_all_buffer_data) {
+    const unsigned int buffer_size = TEST_BUFFER_SIZE;
+    const unsigned int num_buffers = 4;
+
+    size_t pool_mem_size = SHARED_BUFFER_POOL_REQUIRED_MEMORY(buffer_size, num_buffers);
+    shared_buffer_pool_handle pool = shared_buffer_pool_create(pool_mem, buffer_size, num_buffers);
+
+    // Find the highest memory address in the pool data
+    void *highest_addr = pool_mem;
+    for (unsigned int i = 0; i < num_buffers; i++) {
+        shared_buffer_handle buffer = shared_buffer_alloc(pool);
+        TEST_ASSERT_NOT_NULL(buffer);
+
+        void *buffer_end = buffer->data + buffer_size - 1;
+        if (buffer_end > highest_addr) highest_addr = buffer_end;
+    }
+
+    TEST_ASSERT_EQUAL(highest_addr, pool_mem + pool_mem_size - 1);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -304,6 +326,8 @@ int main(void) {
     RUN_TEST(test_append_string_too_small_buffer_returns_error);
     RUN_TEST(test_append_string_to_full_buffer_returns_error);
     RUN_TEST(test_append_string_to_partially_full_buffer);
+
+    RUN_TEST(test_pool_memory_macro_covers_all_buffer_data);
 
     return UNITY_END();
 }

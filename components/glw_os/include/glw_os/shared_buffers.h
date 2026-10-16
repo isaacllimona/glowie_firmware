@@ -2,7 +2,7 @@
 
 #include "glw_os/mutex.h"
 
-#define SHARED_BUFFER_POOL_REQUIRED_MEMORY(buffer_size, num_buffers) (sizeof(struct shared_buffer) + num_buffers * (sizeof(struct shared_buffer_pool) + buffer_size))
+#define SHARED_BUFFER_POOL_REQUIRED_MEMORY(buffer_size, num_buffers) (sizeof(struct shared_buffer_pool) + num_buffers * (sizeof(struct shared_buffer) + buffer_size))
 
 typedef struct shared_buffer *shared_buffer_handle;
 typedef struct shared_buffer_pool *shared_buffer_pool_handle;
