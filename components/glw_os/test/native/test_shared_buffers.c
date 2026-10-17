@@ -168,6 +168,17 @@ TEST_CASE(alloc_size_insufficient_returns_null) {
     TEST_ASSERT_NULL(buffer);
 }
 
+TEST_CASE(alloc_size_on_empty_pool_returns_null) {
+    unsigned int num_buffers = 4;
+    shared_buffer_pool_handle pool = make_pool(num_buffers);
+
+    for (int i = 0; i < num_buffers; i++) {
+        shared_buffer_alloc(pool);
+    }
+
+    TEST_ASSERT_NULL(shared_buffer_alloc_size(pool, 2 * TEST_BUFFER_SIZE));
+}
+
 TEST_CASE(alloc_size_single_buffer_fit) {
     shared_buffer_pool_handle pool = make_pool(4);
 
@@ -316,6 +327,7 @@ int main(void) {
     RUN_TEST(test_release_path_uses_mutex_balanced);
 
     RUN_TEST(test_alloc_size_insufficient_returns_null);
+    RUN_TEST(test_alloc_size_on_empty_pool_returns_null);
     RUN_TEST(test_alloc_size_single_buffer_fit);
     RUN_TEST(test_alloc_size_spans_multiple_buffers);
     RUN_TEST(test_alloc_size_fills_buffer_partially);

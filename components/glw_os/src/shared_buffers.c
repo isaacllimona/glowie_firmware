@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -29,6 +30,7 @@ shared_buffer_pool_handle shared_buffer_pool_create(char *memory, unsigned int b
 
         // add buffer to pool
         new_item->next = pool->head;
+        new_item->owner_count = 0;
         pool->head = new_item;
     }
 
@@ -38,7 +40,7 @@ shared_buffer_pool_handle shared_buffer_pool_create(char *memory, unsigned int b
 shared_buffer_handle shared_buffer_alloc(shared_buffer_pool_handle pool) {
     os_mutex_take(pool->mutex, os_max_timeout);
     shared_buffer_handle buffer = pool->head;
-    if(buffer != NULL) pool->head = buffer->next;;
+    if(buffer != NULL) pool->head = buffer->next;
     os_mutex_give(pool->mutex);
 
     if(buffer != NULL) {
@@ -56,8 +58,8 @@ shared_buffer_handle shared_buffer_alloc_size(shared_buffer_pool_handle pool, un
     shared_buffer_handle head = pool->head;
     shared_buffer_handle tail = head;
     for (int i = 1; i < num_buffers; i++) {
-        tail = tail->next;
         if (tail == NULL) break;
+        tail = tail->next;
     }
     if (tail != NULL) pool->head = tail->next;
     os_mutex_give(pool->mutex);
@@ -85,19 +87,24 @@ void shared_buffer_free(shared_buffer_handle buffer) {
 
 void shared_buffer_claim(shared_buffer_handle buffer) {
     os_mutex_take(buffer->pool->mutex, os_max_timeout);
+    assert(buffer->owner_count > 0);
     buffer->owner_count += 1;
     os_mutex_give(buffer->pool->mutex);
 }
 
 void shared_buffer_release(shared_buffer_handle buffer) {
+    bool shall_free_mutex = false;
+
     os_mutex_take(buffer->pool->mutex, os_max_timeout);
-    if (buffer->owner_count > 0) {
-        buffer->owner_count -= 1;
-        if (buffer->owner_count == 0) {
-            shared_buffer_free(buffer);
-        }
+    assert(buffer->owner_count > 0);
+    buffer->owner_count -= 1;
+    if (buffer->owner_count == 0) {
+        shall_free_mutex = true;
     }
     os_mutex_give(buffer->pool->mutex);
+
+    if (shall_free_mutex)
+        shared_buffer_free(buffer);
 }
 
 shared_buffer_handle shared_buffer_alloc_from_string(shared_buffer_pool_handle pool, const char *str) {
