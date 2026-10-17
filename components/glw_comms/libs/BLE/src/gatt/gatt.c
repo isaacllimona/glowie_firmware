@@ -20,7 +20,6 @@ static_assert(strlen(CONFIG_DEVICE_NAME) <= MYNEWT_VAL_BLE_SVC_GAP_DEVICE_NAME_M
               "Device name too long");
 
 static command_cb_t command_cb;
-static uint16_t conn_handle;
 
 // ===============================================
 //             SERVICE DEFINITIONS

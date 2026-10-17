@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "glw_comms_ble.h"
 #include "glw_comms_commands.h"
 
@@ -12,6 +14,8 @@ static glw_comms_ble_error_t on_command(const char *cmd) {
             return BLE_ERR_BAD_COMMAND;
         case CMD_ERR_OK:
             return 0;
+        default:
+            assert(0);
     }
 }
 
