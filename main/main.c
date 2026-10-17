@@ -80,7 +80,7 @@ void app_main(void) {
     glw_led_init();
 
     const glw_script_init_t script_init = {
-        .get_time = sync_clock_get,
+        .get_sync_time = sync_clock_get,
         .error_cb = script_err_cb,
     };
     glw_script_init(&script_init);

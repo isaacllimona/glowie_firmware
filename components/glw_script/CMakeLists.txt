@@ -1,6 +1,4 @@
-glw_exclude_from_native_build()
-
-set(TARGET glw_script)
+# lua target
 
 set(lua_srcs
     "lua/lapi.c"
@@ -37,17 +35,41 @@ set(lua_srcs
     "lua/lzio.c"
 )
 
-glw_add_module(${TARGET}
-    SOURCES
-        ${lua_srcs}
-        src/glw_script.c
-        src/glw_script_task.c
-        src/builtin_lua_funcs.c
-        src/lua_libs/led.c
-    INCLUDE_PRIVATE lua src
-    DEPENDS glw_log glw_os
+add_library(lua STATIC ${lua_srcs})
+
+target_include_directories(lua PUBLIC lua)
+
+target_compile_definitions(lua PRIVATE LUA_32BITS=1)
+
+if(BUILD_NATIVE)
+    target_link_libraries(lua PRIVATE m)
+endif()
+
+# glw_script target
+
+set(TARGET glw_script)
+
+set(SOURCES
+    src/glw_script_queue.c
+    src/glw_script_lua.c
+    src/lua_libs/led.c
 )
 
 if(NOT BUILD_NATIVE)
-    target_compile_definitions(${TARGET} PRIVATE LUA_32BITS=1)
+    list(APPEND SOURCES src/glw_script.c)
+endif()
+
+add_library(${TARGET} STATIC ${SOURCES})
+
+target_include_directories(${TARGET} PUBLIC include PRIVATE src)
+
+target_link_libraries(${TARGET}
+    PUBLIC glw_os
+    PRIVATE
+        glw_log
+        lua
+)
+
+if(BUILD_TESTING)
+    add_subdirectory(test)
 endif()

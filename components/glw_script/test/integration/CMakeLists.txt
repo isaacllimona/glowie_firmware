@@ -12,6 +12,7 @@ target_include_directories(${TARGET}
 target_link_libraries(${TARGET} PRIVATE
     glw_script
     glw_os
+    lua
 )
 
 link_idf_components(${TARGET} PRIVATE unity)

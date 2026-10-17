@@ -2,7 +2,7 @@
 
 #include "lauxlib.h"
 
-#include "glw_script_priv.h"
+#include "glw_script_lua.h"
 #include "lua.h"
 
 #include "glw_script_libs/led.h"
@@ -15,7 +15,7 @@ static void (*update)(void);
 
 static int lua_check_integer_at_index(lua_State *L, int table_idx, int element_idx) {
     lua_geti(L, table_idx, element_idx);
-    luaL_checkinteger(L, -1);
+    return luaL_checkinteger(L, -1);
 }
 
 // ===== LUA library funcions =====
@@ -83,5 +83,5 @@ void glw_script_libs_led_add(const glw_script_libs_led_init_t *init) {
     set_pixel_color_rgb = init->set_pixel_color_rgb;
     update = init->update;
 
-    add_lua_library(lib_funcs, "led");
+    glw_script_lua_add_library(lib_funcs, "led");
 }
