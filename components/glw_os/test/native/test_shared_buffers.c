@@ -289,6 +289,131 @@ TEST_CASE(append_string_to_partially_full_buffer) {
     TEST_ASSERT_EQUAL_MEMORY(str, buffer->data + 10, strlen(str));
 }
 
+// --- reader
+
+TEST_CASE(reader_create_sets_cursor_to_buffer) {
+    shared_buffer_pool_handle pool = make_pool(4);
+    shared_buffer_handle buffer = shared_buffer_alloc(pool);
+
+    shared_buffer_reader reader = shared_buffer_reader_create(buffer);
+
+    TEST_ASSERT_EQUAL_PTR(buffer, reader.buffer_cursor);
+}
+
+TEST_CASE(reader_create_null_buffer) {
+    shared_buffer_reader reader = shared_buffer_reader_create(NULL);
+
+    TEST_ASSERT_NULL(reader.buffer_cursor);
+}
+
+TEST_CASE(reader_read_single_buffer) {
+    shared_buffer_pool_handle pool = make_pool(4);
+    shared_buffer_handle buffer = shared_buffer_alloc(pool);
+    shared_buffer_append_string(buffer, "hello");
+
+    shared_buffer_reader reader = shared_buffer_reader_create(buffer);
+    unsigned int length = 1234;
+
+    const char *data = shared_buffer_reader_read(&reader, &length);
+
+    TEST_ASSERT_EQUAL_PTR(buffer->data, data);
+    TEST_ASSERT_EQUAL(strlen("hello"), length);
+    TEST_ASSERT_EQUAL_MEMORY("hello", data, length);
+    TEST_ASSERT_NULL(reader.buffer_cursor);
+}
+
+TEST_CASE(reader_read_empty_buffer_returns_zero_length) {
+    shared_buffer_pool_handle pool = make_pool(4);
+    shared_buffer_handle buffer = shared_buffer_alloc(pool);
+
+    shared_buffer_reader reader = shared_buffer_reader_create(buffer);
+    unsigned int length = 1234;
+
+    const char *data = shared_buffer_reader_read(&reader, &length);
+
+    TEST_ASSERT_EQUAL_PTR(buffer->data, data);
+    TEST_ASSERT_EQUAL(0, length);
+    TEST_ASSERT_NULL(reader.buffer_cursor);
+}
+
+TEST_CASE(reader_read_exhausted_returns_null_and_zero_length) {
+    shared_buffer_reader reader = shared_buffer_reader_create(NULL);
+    unsigned int length = 1234;
+
+    const char *data = shared_buffer_reader_read(&reader, &length);
+
+    TEST_ASSERT_NULL(data);
+    TEST_ASSERT_EQUAL(0, length);
+}
+
+TEST_CASE(reader_read_walks_chain_in_order) {
+    shared_buffer_pool_handle pool = make_pool(4);
+    shared_buffer_handle buffer = shared_buffer_alloc_size(pool, 2 * TEST_BUFFER_SIZE + 5);
+
+    unsigned int str_len = 2 * TEST_BUFFER_SIZE + 5;
+    char str[3 * TEST_BUFFER_SIZE];
+    for (unsigned int i = 0; i < str_len; i++) str[i] = 'a' + (i % 26);
+    str[str_len] = 0;
+
+    shared_buffer_append_string(buffer, str);
+
+    shared_buffer_reader reader = shared_buffer_reader_create(buffer);
+    unsigned int length = 0;
+
+    const char *data = shared_buffer_reader_read(&reader, &length);
+    TEST_ASSERT_EQUAL(TEST_BUFFER_SIZE, length);
+    TEST_ASSERT_EQUAL_MEMORY(str, data, TEST_BUFFER_SIZE);
+
+    data = shared_buffer_reader_read(&reader, &length);
+    TEST_ASSERT_EQUAL(TEST_BUFFER_SIZE, length);
+    TEST_ASSERT_EQUAL_MEMORY(str + TEST_BUFFER_SIZE, data, TEST_BUFFER_SIZE);
+
+    data = shared_buffer_reader_read(&reader, &length);
+    TEST_ASSERT_EQUAL(5, length);
+    TEST_ASSERT_EQUAL_MEMORY(str + 2 * TEST_BUFFER_SIZE, data, 5);
+    TEST_ASSERT_NULL(reader.buffer_cursor);
+
+    data = shared_buffer_reader_read(&reader, &length);
+    TEST_ASSERT_NULL(data);
+    TEST_ASSERT_EQUAL(0, length);
+}
+
+TEST_CASE(reader_read_is_repeatable_from_independent_readers) {
+    shared_buffer_pool_handle pool = make_pool(4);
+    shared_buffer_handle buffer = shared_buffer_alloc(pool);
+    shared_buffer_append_string(buffer, "payload");
+
+    shared_buffer_reader first = shared_buffer_reader_create(buffer);
+    shared_buffer_reader second = shared_buffer_reader_create(buffer);
+    unsigned int length = 0;
+
+    const char *first_data = shared_buffer_reader_read(&first, &length);
+    TEST_ASSERT_EQUAL(7, length);
+
+    const char *second_data = shared_buffer_reader_read(&second, &length);
+    TEST_ASSERT_EQUAL(7, length);
+
+    TEST_ASSERT_EQUAL_PTR(first_data, second_data);
+    TEST_ASSERT_EQUAL_MEMORY("payload", first_data, 7);
+    TEST_ASSERT_EQUAL_MEMORY("payload", second_data, 7);
+}
+
+TEST_CASE(reader_read_does_not_modify_buffer) {
+    shared_buffer_pool_handle pool = make_pool(4);
+    shared_buffer_handle buffer = shared_buffer_alloc(pool);
+    shared_buffer_append_string(buffer, "hello");
+
+    shared_buffer_reader reader = shared_buffer_reader_create(buffer);
+    unsigned int length = 0;
+
+    shared_buffer_reader_read(&reader, &length);
+
+    TEST_ASSERT_EQUAL(5, buffer->len);
+    TEST_ASSERT_EQUAL(1, buffer->owner_count);
+    TEST_ASSERT_NULL(buffer->next);
+    TEST_ASSERT_EQUAL_MEMORY("hello", buffer->data, 5);
+}
+
 // --- pool required memory macro
 
 TEST_CASE(pool_memory_macro_covers_all_buffer_data) {
@@ -338,6 +463,15 @@ int main(void) {
     RUN_TEST(test_append_string_too_small_buffer_returns_error);
     RUN_TEST(test_append_string_to_full_buffer_returns_error);
     RUN_TEST(test_append_string_to_partially_full_buffer);
+
+    RUN_TEST(test_reader_create_sets_cursor_to_buffer);
+    RUN_TEST(test_reader_create_null_buffer);
+    RUN_TEST(test_reader_read_single_buffer);
+    RUN_TEST(test_reader_read_empty_buffer_returns_zero_length);
+    RUN_TEST(test_reader_read_exhausted_returns_null_and_zero_length);
+    RUN_TEST(test_reader_read_walks_chain_in_order);
+    RUN_TEST(test_reader_read_is_repeatable_from_independent_readers);
+    RUN_TEST(test_reader_read_does_not_modify_buffer);
 
     RUN_TEST(test_pool_memory_macro_covers_all_buffer_data);
 

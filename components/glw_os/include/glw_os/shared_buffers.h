@@ -21,6 +21,10 @@ struct shared_buffer_pool {
     os_mutex_handle_t mutex;
 };
 
+typedef struct {
+    shared_buffer_handle buffer_cursor;
+} shared_buffer_reader;
+
 shared_buffer_pool_handle shared_buffer_pool_create(char *memory, unsigned int buffer_size, unsigned int num_buffers);
 
 shared_buffer_handle shared_buffer_alloc(shared_buffer_pool_handle pool);
@@ -36,3 +40,7 @@ void shared_buffer_release(shared_buffer_handle buffer);
 int shared_buffer_append_string(shared_buffer_handle buffer, const char *str);
 
 shared_buffer_handle shared_buffer_alloc_from_string(shared_buffer_pool_handle pool, const char *str);
+
+shared_buffer_reader shared_buffer_reader_create(shared_buffer_handle buffer);
+
+const char *shared_buffer_reader_read(shared_buffer_reader *reader, unsigned int *length);

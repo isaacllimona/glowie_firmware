@@ -164,3 +164,21 @@ int shared_buffer_append_string(shared_buffer_handle buffer, const char *str) {
 
     return 0;
 }
+
+shared_buffer_reader shared_buffer_reader_create(shared_buffer_handle buffer) {
+    return (shared_buffer_reader){.buffer_cursor = buffer};
+}
+
+const char *shared_buffer_reader_read(shared_buffer_reader *reader, unsigned int *length) {
+    if (reader->buffer_cursor == NULL) {
+        *length = 0;
+        return NULL;
+    }
+
+    const char *str = reader->buffer_cursor->data;
+    *length = reader->buffer_cursor->len;
+
+    reader->buffer_cursor = reader->buffer_cursor->next;
+
+    return str;
+}
